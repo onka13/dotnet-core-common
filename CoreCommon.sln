@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29424.173
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infra", "Infra", "{2F2DDBCF-8221-442D-B8DB-72AE116302B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreCommon.Infra", "CoreCommon.Infra\CoreCommon.Infra.csproj", "{25B11FAC-89CC-4341-9379-C9AF0E0D3AFA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{25B11FAC-89CC-4341-9379-C9AF0E0D3AFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25B11FAC-89CC-4341-9379-C9AF0E0D3AFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25B11FAC-89CC-4341-9379-C9AF0E0D3AFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25B11FAC-89CC-4341-9379-C9AF0E0D3AFA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{25B11FAC-89CC-4341-9379-C9AF0E0D3AFA} = {2F2DDBCF-8221-442D-B8DB-72AE116302B7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9FC82EEE-42A5-4557-A717-BF30413BE778}
+	EndGlobalSection
+EndGlobal
