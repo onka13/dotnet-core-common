@@ -1,6 +1,6 @@
 ﻿namespace CoreCommon.Data.Domain.Business
 {
-    public static class ServiceResultCode
+    public class ServiceResultCode
     {
         public const int Created = 12;
         public const int Updated = 11;
