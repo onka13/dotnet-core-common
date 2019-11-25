@@ -2,11 +2,15 @@
 
 namespace CoreCommon.Data.Domain.Enums
 {
+    /// <summary>
+    /// Status enum
+    /// </summary>
     public enum Status : byte
     {
-        [Description("")]
+        [Description("Active")]
         Active = 0,
-        [Description("")]
+
+        [Description("Passive")]
         Passive = 1,        
     }
 }

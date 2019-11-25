@@ -8,40 +8,45 @@ using System.Text;
 
 namespace CoreCommon.Data.ElasticSearch.Base
 {
-    public class ElasticSearchRepositoryBase<T, T2> : IElasticRepositoryBase<T, T2> where T : class, IElasticSearchEntity<T2>
+    /// <summary>
+    /// Elastic search base repository
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <typeparam name="TPrimaryKey"></typeparam>
+    public class ElasticSearchRepositoryBase<TEntity, TPrimaryKey> : IElasticRepositoryBase<TEntity, TPrimaryKey> where TEntity : class, IElasticSearchEntity<TPrimaryKey>
     {
         public IElasticClient ElasticClient { get; set; }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<TEntity> GetAll()
         {
-            return ElasticClient.Search<T>(s => s.MatchAll()).Documents.ToList();
+            return ElasticClient.Search<TEntity>(s => s.MatchAll()).Documents.ToList();
         }
 
-        public T GetBy(T2 id)
+        public TEntity GetBy(TPrimaryKey id)
         {
-            return ElasticClient.Get<T>(id.ToString()).Source;
+            return ElasticClient.Get<TEntity>(id.ToString()).Source;
         }
 
-        public bool Delete(T2 id)
+        public bool Delete(TPrimaryKey id)
         {
-            var deleteResponse = ElasticClient.Delete(new DocumentPath<T>(id.ToString()));
+            var deleteResponse = ElasticClient.Delete(new DocumentPath<TEntity>(id.ToString()));
             return deleteResponse.Result == Result.Deleted;
         }
 
-        public bool Edit(T entity)
+        public bool Edit(TEntity entity)
         {
-            var updateResponse = ElasticClient.Update<T, T>(new UpdateDescriptor<T, T>(entity));
+            var updateResponse = ElasticClient.Update<TEntity, TEntity>(new UpdateDescriptor<TEntity, TEntity>(entity));
             return updateResponse.Result == Result.Updated;
         }
 
-        public T Add(T entity)
+        public TEntity Add(TEntity entity)
         {
             var indexResponse = ElasticClient.IndexDocument(entity);
             if (indexResponse.Result == Result.Created)
             {
                 return null;
             }
-            entity.Id = (T2)Convert.ChangeType(indexResponse.Id, typeof(T2));
+            entity.Id = (TPrimaryKey)Convert.ChangeType(indexResponse.Id, typeof(TPrimaryKey));
             return entity;
         }
     }

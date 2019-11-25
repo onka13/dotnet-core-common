@@ -5,9 +5,13 @@ using System.Linq.Expressions;
 
 namespace CoreCommon.Business.Service.Base
 {
-    public class BusinessLogicBase<T> : IBusinessLogicBase<T>
+    /// <summary>
+    /// Business logic base class
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    public class BusinessLogicBase<TEntity> : IBusinessLogicBase<TEntity>
     {
-        public IRepositoryBase<T> Repository { get; set; }
+        public IRepositoryBase<TEntity> Repository { get; set; }
 
         public void SetRef(string refId)
         {
@@ -39,9 +43,9 @@ namespace CoreCommon.Business.Service.Base
             Repository.RollbackTransaction(newRefId);
         }
 
-        public ServiceResult<IEnumerable<T>> GetAll()
+        public ServiceResult<IEnumerable<TEntity>> GetAll()
         {
-            var response = ServiceResult<IEnumerable<T>>.Instance.ErrorResult(ServiceResultCode.Error);
+            var response = ServiceResult<IEnumerable<TEntity>>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.GetAll();
             if (form != null)
             {
@@ -50,9 +54,9 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<IEnumerable<T>> FindBy(Expression<Func<T, bool>> predicate)
+        public ServiceResult<IEnumerable<TEntity>> FindBy(Expression<Func<TEntity, bool>> predicate)
         {
-            var response = ServiceResult<IEnumerable<T>>.Instance.ErrorResult(ServiceResultCode.Error);
+            var response = ServiceResult<IEnumerable<TEntity>>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.FindBy(predicate);
             if (form != null)
             {
@@ -61,9 +65,9 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<IEnumerable<T>> FindAndIncludeBy<TProp>(Expression<Func<T, bool>> predicate, params Expression<Func<T, TProp>>[] include)
+        public ServiceResult<IEnumerable<TEntity>> FindAndIncludeBy<TProp>(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, TProp>>[] include)
         {
-            var response = ServiceResult<IEnumerable<T>>.Instance.ErrorResult(ServiceResultCode.Error);
+            var response = ServiceResult<IEnumerable<TEntity>>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.FindAndIncludeBy(predicate, include);
             if (form != null)
             {
@@ -72,9 +76,9 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<T> GetBy(Expression<Func<T, bool>> predicate)
+        public ServiceResult<TEntity> GetBy(Expression<Func<TEntity, bool>> predicate)
         {
-            var response = ServiceResult<T>.Instance.ErrorResult(ServiceResultCode.Error);
+            var response = ServiceResult<TEntity>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.GetBy(predicate);
             if (form != null)
             {
@@ -83,9 +87,9 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<T> Add(T entity)
+        public ServiceResult<TEntity> Add(TEntity entity)
         {
-            var response = ServiceResult<T>.Instance.ErrorResult(ServiceResultCode.Error);
+            var response = ServiceResult<TEntity>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.Add(entity);
             if (form != null)
             {
@@ -94,7 +98,7 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<int> BulkInsert(List<T> entities)
+        public ServiceResult<int> BulkInsert(List<TEntity> entities)
         {
             var response = ServiceResult<int>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.BulkInsert(entities);
@@ -105,7 +109,7 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<int> BulkEdit(List<T> entities)
+        public ServiceResult<int> BulkEdit(List<TEntity> entities)
         {
             var response = ServiceResult<int>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.BulkUpdate(entities);
@@ -116,7 +120,7 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<int> BulkDelete(List<T> entities)
+        public ServiceResult<int> BulkDelete(List<TEntity> entities)
         {
             var response = ServiceResult<int>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.BulkDelete(entities);
@@ -127,7 +131,7 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<int> BulkEditOnly(List<T> entities, params Expression<Func<T, object>>[] properties)
+        public ServiceResult<int> BulkEditOnly(List<TEntity> entities, params Expression<Func<TEntity, object>>[] properties)
         {
             var response = ServiceResult<int>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.BulkUpdateOnly(entities, properties);
@@ -138,9 +142,9 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<T> Delete(T entity)
+        public ServiceResult<TEntity> Delete(TEntity entity)
         {
-            var response = ServiceResult<T>.Instance.ErrorResult(ServiceResultCode.Error);
+            var response = ServiceResult<TEntity>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.Delete(entity);
             if (form > 0)
             {
@@ -149,7 +153,7 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<int> DeleteBy(Expression<Func<T, bool>> predicate)
+        public ServiceResult<int> DeleteBy(Expression<Func<TEntity, bool>> predicate)
         {
             var response = ServiceResult<int>.Instance.ErrorResult(ServiceResultCode.Error);
             var form = Repository.DeleteBy(predicate);
@@ -160,7 +164,7 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<int> Edit(T entity, params string[] properties)
+        public ServiceResult<int> Edit(TEntity entity, params string[] properties)
         {
             var response = ServiceResult<int>.Instance.ErrorResult(ServiceResultCode.Error);
             var affected = Repository.EditBy(entity, properties);
@@ -171,7 +175,7 @@ namespace CoreCommon.Business.Service.Base
             return response;
         }
 
-        public ServiceResult<int> EditOnly(T entity, params Expression<Func<T, object>>[] properties)
+        public ServiceResult<int> EditOnly(TEntity entity, params Expression<Func<TEntity, object>>[] properties)
         {
             var response = ServiceResult<int>.Instance.ErrorResult(ServiceResultCode.Error);
             var affected = Repository.EditOnly(entity, properties);

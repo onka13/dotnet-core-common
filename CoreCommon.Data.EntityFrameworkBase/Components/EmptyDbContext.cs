@@ -2,6 +2,9 @@
 
 namespace CoreCommon.Data.EntityFrameworkBase.Components
 {
+    /// <summary>
+    /// A simple Db Context
+    /// </summary>
     public class EmptyDbContext : DbContextBase
     {
         public override string Name { get => _name; }

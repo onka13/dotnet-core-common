@@ -1,5 +1,8 @@
 ﻿namespace CoreCommon.Data.Domain.Config
 {
+    /// <summary>
+    /// Email configuration model which defined in appsettings.
+    /// </summary>
     public class SmtpConfig
     {
         public string Name { get; set; }

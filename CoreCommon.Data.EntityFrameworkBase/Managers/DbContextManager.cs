@@ -7,11 +7,24 @@ using Autofac;
 
 namespace CoreCommon.Data.EntityFrameworkBase.Managers
 {
+    /// <summary>
+    /// Manages all instance of DbContexts.
+    /// </summary>
     public class DbContextManager
     {
+        /// <summary>
+        /// Autofac component to resolve dependencies
+        /// </summary>
         public IComponentContext ComponentContext { get; set; }
 
+        /// <summary>
+        /// Contains dbcontexts
+        /// </summary>
         private Dictionary<string, DbContext> _initializedDbContexts;
+
+        /// <summary>
+        /// Contains transactions
+        /// </summary>
         private Dictionary<string, IDbContextTransaction> _transactions;
 
         public DbContextManager()

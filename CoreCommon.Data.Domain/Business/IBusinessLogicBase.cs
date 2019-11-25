@@ -4,7 +4,11 @@ using System.Linq.Expressions;
 
 namespace CoreCommon.Data.Domain.Business
 {
-    public interface IBusinessLogicBase<T>
+    /// <summary>
+    /// Business logic base interface
+    /// </summary>
+    /// <typeparam name="TEntity">Entity Type</typeparam>
+    public interface IBusinessLogicBase<TEntity>
     {
         void SetRef(string refId);
         string GetRef();
@@ -12,18 +16,18 @@ namespace CoreCommon.Data.Domain.Business
         void BeginTransaction(string newRefId = null);
         void CommitTransaction(string newRefId = null);
         void RollbackTransaction(string newRefId = null);
-        ServiceResult<IEnumerable<T>> GetAll();
-        ServiceResult<IEnumerable<T>> FindBy(Expression<Func<T, bool>> predicate);
-        ServiceResult<IEnumerable<T>> FindAndIncludeBy<TProp>(Expression<Func<T, bool>> predicate, params Expression<Func<T, TProp>>[] include);
-        ServiceResult<T> GetBy(Expression<Func<T, bool>> predicate);
-        ServiceResult<T> Add(T entity);
-        ServiceResult<T> Delete(T entity);
-        ServiceResult<int> DeleteBy(Expression<Func<T, bool>> predicate);
-        ServiceResult<int> Edit(T entity, params string[] properties);
-        ServiceResult<int> EditOnly(T entity, params Expression<Func<T, object>>[] properties);
-        ServiceResult<int> BulkInsert(List<T> entities);
-        ServiceResult<int> BulkDelete(List<T> entities);
-        ServiceResult<int> BulkEdit(List<T> entities);
-        ServiceResult<int> BulkEditOnly(List<T> entities, params Expression<Func<T, object>>[] properties);
+        ServiceResult<IEnumerable<TEntity>> GetAll();
+        ServiceResult<IEnumerable<TEntity>> FindBy(Expression<Func<TEntity, bool>> predicate);
+        ServiceResult<IEnumerable<TEntity>> FindAndIncludeBy<TProp>(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, TProp>>[] include);
+        ServiceResult<TEntity> GetBy(Expression<Func<TEntity, bool>> predicate);
+        ServiceResult<TEntity> Add(TEntity entity);
+        ServiceResult<TEntity> Delete(TEntity entity);
+        ServiceResult<int> DeleteBy(Expression<Func<TEntity, bool>> predicate);
+        ServiceResult<int> Edit(TEntity entity, params string[] properties);
+        ServiceResult<int> EditOnly(TEntity entity, params Expression<Func<TEntity, object>>[] properties);
+        ServiceResult<int> BulkInsert(List<TEntity> entities);
+        ServiceResult<int> BulkDelete(List<TEntity> entities);
+        ServiceResult<int> BulkEdit(List<TEntity> entities);
+        ServiceResult<int> BulkEditOnly(List<TEntity> entities, params Expression<Func<TEntity, object>>[] properties);
     }
 }

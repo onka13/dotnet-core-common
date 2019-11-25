@@ -4,6 +4,9 @@ using System;
 
 namespace CoreCommon.Infra.Converters
 {
+    /// <summary>
+    /// DateTime converter for JSON serialization and deserialization
+    /// </summary>
     public class DateTimeConverter : DateTimeConverterBase
     {
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

@@ -10,7 +10,12 @@ using CoreCommon.Data.Domain.Business;
 
 namespace CoreCommon.Data.EntityFrameworkBase.Base
 {
-    public class EntityFrameworkBaseRepository<T, T2> where T : class, IEntityBase, new() where T2 : DbContext
+    /// <summary>
+    /// EF base repository
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <typeparam name="TDbContext"></typeparam>
+    public class EntityFrameworkBaseRepository<TEntity, TDbContext> where TEntity : class, IEntityBase, new() where TDbContext : DbContext
     {
         public string RefId { get; private set; }
 
@@ -19,12 +24,12 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
         public EntityFrameworkBaseRepository()
         {
             RefId = Guid.NewGuid().ToString();
-            System.Diagnostics.Debug.WriteLine("XXX EFBaseRepo " + typeof(T).Name + " " + RefId);
+            System.Diagnostics.Debug.WriteLine("XXX EFBaseRepo " + typeof(TEntity).Name + " " + RefId);
         }
 
         public void SetRefId(string _ref)
         {
-            System.Diagnostics.Debug.WriteLine("XXX EFBaseRepo REF CHANGED " + typeof(T).Name + " " + RefId + "=>" + _ref);
+            System.Diagnostics.Debug.WriteLine("XXX EFBaseRepo REF CHANGED " + typeof(TEntity).Name + " " + RefId + "=>" + _ref);
             RefId = _ref;
         }
 
@@ -35,31 +40,31 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
 
         public DbContext GetDbContext()
         {
-            return Manager.GetDbContext<T2>(RefId);
+            return Manager.GetDbContext<TDbContext>(RefId);
         }
 
-        public DbSet<T> GetDbSet()
+        public DbSet<TEntity> GetDbSet()
         {
-            return GetDbContext().Set<T>();
+            return GetDbContext().Set<TEntity>();
         }
 
         public int Save()
         {
-            return Manager.Save<T2>(RefId);
+            return Manager.Save<TDbContext>(RefId);
         }
 
-        public virtual IEnumerable<T> GetAll()
+        public virtual IEnumerable<TEntity> GetAll()
         {
             return GetDbSet().AsEnumerable();
         }
 
-        public IEnumerable<T> FindBy(Expression<Func<T, bool>> predicate)
+        public IEnumerable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate)
         {
-            IEnumerable<T> query = GetDbSet().Where(predicate).AsEnumerable();
+            IEnumerable<TEntity> query = GetDbSet().Where(predicate).AsEnumerable();
             return query;
         }
 
-        public IEnumerable<T> FindAndIncludeBy<TProp>(Expression<Func<T, bool>> predicate, params Expression<Func<T, TProp>>[] include)
+        public IEnumerable<TEntity> FindAndIncludeBy<TProp>(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, TProp>>[] include)
         {
             var inc = GetDbSet().Include(include[0]);
             for (int i = 1; i < include.Length; i++)
@@ -69,36 +74,36 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             return inc.Where(predicate).AsEnumerable();
         }
 
-        public int DeleteBy(Expression<Func<T, bool>> predicate)
+        public int DeleteBy(Expression<Func<TEntity, bool>> predicate)
         {
-            IEnumerable<T> query = GetDbSet().Where(predicate);
+            IEnumerable<TEntity> query = GetDbSet().Where(predicate);
             GetDbSet().RemoveRange(query);
             return Save();
         }
 
-        public T GetBy(Expression<Func<T, bool>> predicate)
+        public TEntity GetBy(Expression<Func<TEntity, bool>> predicate)
         {
             return GetDbSet().FirstOrDefault(predicate);
         }
 
-        public virtual T Add(T entity)
+        public virtual TEntity Add(TEntity entity)
         {
             GetDbSet().Add(entity);
             Save();
             return entity;
         }
 
-        public virtual int Delete(T entity)
+        public virtual int Delete(TEntity entity)
         {
             return SetState(entity, EntityState.Deleted);
         }
 
-        public virtual int Edit(T entity)
+        public virtual int Edit(TEntity entity)
         {
             return SetState(entity, EntityState.Modified);
         }
 
-        public virtual int EditOnly(T entity, params Expression<Func<T, object>>[] properties)
+        public virtual int EditOnly(TEntity entity, params Expression<Func<TEntity, object>>[] properties)
         {
             if (properties == null || properties.Length == 0)
             {
@@ -112,7 +117,7 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             return Save();
         }
 
-        public virtual int EditBy(T entity, params string[] properties)
+        public virtual int EditBy(TEntity entity, params string[] properties)
         {
             if (properties == null || properties.Length == 0)
             {
@@ -134,7 +139,7 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             //return SetState(entity, EntityState.Modified);
         }
 
-        public virtual int BulkEditBy(List<T> entities, params string[] properties)
+        public virtual int BulkEditBy(List<TEntity> entities, params string[] properties)
         {
             //disable detection of changes to improve performance
             //db.Configuration.AutoDetectChangesEnabled = false;
@@ -171,7 +176,7 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             return result.Select(x => (object)x).ToList();
         }
 
-        protected int SetState(T entity, EntityState state)
+        protected int SetState(TEntity entity, EntityState state)
         {
             SetStateOnly(entity, state);
             return Save();
@@ -197,10 +202,10 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
 
         public string GetTableName()
         {
-            return typeof(T).Name.Replace("Entity", "");
+            return typeof(TEntity).Name.Replace("Entity", "");
         }
 
-        public int BulkInsert(List<T> entityList)
+        public int BulkInsert(List<TEntity> entityList)
         {
             if (entityList.Count == 0) return 0;
 
@@ -208,7 +213,7 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             return Save();
         }
 
-        public int BulkUpdate(List<T> entityList)
+        public int BulkUpdate(List<TEntity> entityList)
         {
             if (entityList.Count == 0) return 0;
 
@@ -219,7 +224,7 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             return Save();
         }
 
-        public int BulkDelete(List<T> entityList)
+        public int BulkDelete(List<TEntity> entityList)
         {
             if (entityList.Count == 0) return 0;
 
@@ -230,7 +235,7 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             return Save();
         }
 
-        public int BulkUpdateOnly(List<T> entityList, params Expression<Func<T, object>>[] properties)
+        public int BulkUpdateOnly(List<TEntity> entityList, params Expression<Func<TEntity, object>>[] properties)
         {
             if (entityList.Count == 0) return 0;
             if (properties == null || properties.Length == 0)
@@ -290,22 +295,22 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
         public void BeginTransaction(string newRefId = null)
         {
             if (newRefId != null) SetRefId(newRefId);
-            Manager.BeginTransaction<T2>(newRefId ?? RefId);
+            Manager.BeginTransaction<TDbContext>(newRefId ?? RefId);
         }
 
         public void CommitTransaction(string newRefId = null)
         {
-            Manager.CommitTransaction<T2>(newRefId ?? RefId);
+            Manager.CommitTransaction<TDbContext>(newRefId ?? RefId);
         }
 
         public void RollbackTransaction(string newRefId = null)
         {
-            Manager.RollbackTransaction<T2>(newRefId ?? RefId);
+            Manager.RollbackTransaction<TDbContext>(newRefId ?? RefId);
         }
 
         public bool HasTransaction(string newRefId = null)
         {
-            return Manager.HasTransaction<T2>(newRefId ?? RefId);
+            return Manager.HasTransaction<TDbContext>(newRefId ?? RefId);
         }
     }
 }

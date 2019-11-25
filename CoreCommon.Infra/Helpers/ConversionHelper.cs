@@ -7,8 +7,17 @@ using System.IO;
 
 namespace CoreCommon.Infra.Helpers
 {
+    /// <summary>
+    /// Conversion Helpers.
+    /// </summary>
     public static class ConversionHelper
     {
+        /// <summary>
+        /// Returns an object of the specified type and whose value is equivalent to the specified object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static T ChangeType<T>(object value)
         {
             var t = typeof(T);
@@ -25,6 +34,13 @@ namespace CoreCommon.Infra.Helpers
             return (T)Convert.ChangeType(value, t);
         }
 
+        /// <summary>
+        /// Serializes the specified System.Object and writes the JSON structure using the specified System.IO.TextWriter.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="culture"></param>
+        /// <param name="isCamelCase"></param>
+        /// <returns></returns>
         public static string Serialize(object obj, CultureInfo culture = null, bool isCamelCase = false)
         {
             var writer = new StringWriter();
@@ -40,6 +56,14 @@ namespace CoreCommon.Infra.Helpers
             return writer.ToString();
         }
 
+        /// <summary>
+        /// Deserializes the JSON structure contained by the specified Newtonsoft.Json.JsonReader
+        //  into an instance of the specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="json"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public static T Deserialize<T>(string json, CultureInfo culture = null)
         {
             var reader = new JsonTextReader(new StringReader(json));
@@ -50,18 +74,24 @@ namespace CoreCommon.Infra.Helpers
             return serializer.Deserialize<T>(reader);
         }
 
+        /// <summary>
+        /// Clones an object with using JSON deserizalitaion and serialization.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static T JsonClone<T>(this T obj)
         {
             var deserializeSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
             return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj), deserializeSettings);
         }
 
-        public static T Cast<T>(object obj)
-        {
-            var deserializeSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
-            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj), deserializeSettings);
-        }
-
+        /// <summary>
+        /// Converts an object type with using JSON.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static T ConvertTo<T>(object value)
         {
             try

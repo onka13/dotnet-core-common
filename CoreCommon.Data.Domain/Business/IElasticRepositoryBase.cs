@@ -2,12 +2,17 @@
 
 namespace CoreCommon.Data.Domain.Business
 {
-    public interface IElasticRepositoryBase<T, T2>
+    /// <summary>
+    /// Elastic search base repository interface
+    /// </summary>
+    /// <typeparam name="TEntity">Entity Type.</typeparam>
+    /// <typeparam name="TPrimaryKey">Primary key type.</typeparam>
+    public interface IElasticRepositoryBase<TEntity, TPrimaryKey>
     {
-        IEnumerable<T> GetAll();
-        T GetBy(T2 id);
-        bool Delete(T2 id);
-        bool Edit(T entity);
-        T Add(T entity);
+        IEnumerable<TEntity> GetAll();
+        TEntity GetBy(TPrimaryKey id);
+        bool Delete(TPrimaryKey id);
+        bool Edit(TEntity entity);
+        TEntity Add(TEntity entity);
     }
 }

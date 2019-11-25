@@ -5,8 +5,16 @@ using Autofac;
 
 namespace CoreCommon.Data.ElasticSearch.Helpers
 {
+    /// <summary>
+    /// Elastic search helpers
+    /// </summary>
     public class ElasticSearchHelper
     {
+        /// <summary>
+        /// Rgister elastic search client to IoC
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="builder"></param>
         public static void RegisterClient(IConfiguration configuration, ContainerBuilder builder)
         {
             var url = configuration["elasticsearch:url"];

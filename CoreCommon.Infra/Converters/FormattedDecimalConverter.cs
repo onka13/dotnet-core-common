@@ -4,6 +4,9 @@ using System.Globalization;
 
 namespace CoreCommon.Infra.Converters
 {
+    /// <summary>
+    /// Decimal converter for JSON serialization and deserialization
+    /// </summary>
     public class FormattedDecimalConverter : JsonConverter
     {
         private CultureInfo culture;

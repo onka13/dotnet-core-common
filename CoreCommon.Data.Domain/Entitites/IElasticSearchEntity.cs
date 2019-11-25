@@ -1,7 +1,11 @@
 ﻿namespace CoreCommon.Data.Domain.Entitites
 {
-    public interface IElasticSearchEntity<T>
+    /// <summary>
+    /// Default elastic search entity interface
+    /// </summary>
+    /// <typeparam name="TPrimaryKey">Primary Key Type</typeparam>
+    public interface IElasticSearchEntity<TPrimaryKey>
     {
-        T Id { get; set; }
+        TPrimaryKey Id { get; set; }
     }
 }

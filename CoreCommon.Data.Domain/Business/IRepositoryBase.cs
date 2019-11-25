@@ -4,7 +4,11 @@ using System.Linq.Expressions;
 
 namespace CoreCommon.Data.Domain.Business
 {
-    public interface IRepositoryBase<T>
+    /// <summary>
+    /// Repository base interface
+    /// </summary>
+    /// <typeparam name="TEntity">Entity Type</typeparam>
+    public interface IRepositoryBase<TEntity>
     {
         void SetRefId(string refId);
         string GetRefId();
@@ -12,22 +16,22 @@ namespace CoreCommon.Data.Domain.Business
         void CommitTransaction(string newRefId = null);
         void RollbackTransaction(string newRefId = null);
         bool HasTransaction(string newRefId = null);
-        IEnumerable<T> GetAll();
-        IEnumerable<T> FindBy(Expression<Func<T, bool>> predicate);
-        T GetBy(Expression<Func<T, bool>> predicate);
-        T Add(T entity);
-        int Delete(T entity);
-        int DeleteBy(Expression<Func<T, bool>> predicate);
-        int Edit(T entity);
-        int EditBy(T entity, params string[] properties);
-        int EditOnly(T entity, params Expression<Func<T, object>>[] properties);
-        int BulkInsert(List<T> entityList);
-        int BulkUpdate(List<T> entityList);
-        int BulkDelete(List<T> entityList);
-        int BulkUpdateOnly(List<T> entityList, params Expression<Func<T, object>>[] properties);
+        IEnumerable<TEntity> GetAll();
+        IEnumerable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate);
+        TEntity GetBy(Expression<Func<TEntity, bool>> predicate);
+        TEntity Add(TEntity entity);
+        int Delete(TEntity entity);
+        int DeleteBy(Expression<Func<TEntity, bool>> predicate);
+        int Edit(TEntity entity);
+        int EditBy(TEntity entity, params string[] properties);
+        int EditOnly(TEntity entity, params Expression<Func<TEntity, object>>[] properties);
+        int BulkInsert(List<TEntity> entityList);
+        int BulkUpdate(List<TEntity> entityList);
+        int BulkDelete(List<TEntity> entityList);
+        int BulkUpdateOnly(List<TEntity> entityList, params Expression<Func<TEntity, object>>[] properties);
         int Execute(string query, params object[] parameters);
-        int BulkEditBy(List<T> entities, params string[] properties);
-        IEnumerable<T> FindAndIncludeBy<TProp>(Expression<Func<T, bool>> predicate, params Expression<Func<T, TProp>>[] include);
+        int BulkEditBy(List<TEntity> entities, params string[] properties);
+        IEnumerable<TEntity> FindAndIncludeBy<TProp>(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, TProp>>[] include);
         ServiceResult<T1> DoTransaction<T1>(Func<string, T1> func);
         ServiceResult<T1> DoTransactionIfNot<T1>(Func<string, T1> func);
     }

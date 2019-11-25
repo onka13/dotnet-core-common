@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -9,8 +8,18 @@ using System.Text;
 
 namespace CoreCommon.Infra.Helpers
 {
+    /// <summary>
+    /// Authentication Helpers
+    /// </summary>
     public class AuthHelper
     {
+        /// <summary>
+        /// Performs key derivation using the PBKDF2 algorithm.
+        /// </summary>
+        /// <param name="value">The password from which to derive the key.</param>
+        /// <param name="salt">The salt to be used during the key derivation process.</param>
+        /// <param name="iterationCount">The number of iterations of the pseudo-random function to apply during the key derivation process.</param>
+        /// <returns></returns>
         public static string HashPassword(string value, string salt, int iterationCount = 10000)
         {
             var valueBytes = KeyDerivation.Pbkdf2(
@@ -23,11 +32,25 @@ namespace CoreCommon.Infra.Helpers
             return Convert.ToBase64String(valueBytes);
         }
 
+        /// <summary>
+        /// Validates a hash.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="salt"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
         public static bool ValidateHash(string value, string salt, string hash)
         {
             return HashPassword(value, salt) == hash;
         }
 
+        /// <summary>
+        /// Create a JWT token.
+        /// </summary>
+        /// <param name="secretKey"></param>
+        /// <param name="expiryInMinutes"></param>
+        /// <param name="userData"></param>
+        /// <returns></returns>
         public static string CreateToken(string secretKey, int expiryInMinutes, object userData)
         {
             var serializedUserData = ConversionHelper.Serialize(userData);
@@ -47,6 +70,14 @@ namespace CoreCommon.Infra.Helpers
             return tokenHandler.WriteToken(token);
         }
 
+        /// <summary>
+        /// Validates a JWT token.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="token"></param>
+        /// <param name="secretKey"></param>
+        /// <param name="isExpired"></param>
+        /// <returns></returns>
         public static T ValidateToken<T>(string token, string secretKey, out bool isExpired)
         {
             isExpired = false;

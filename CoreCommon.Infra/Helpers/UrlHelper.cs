@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace CoreCommon.Infra.Helpers
 {
+    /// <summary>
+    /// Url helpers
+    /// </summary>
     public class UrlHelper
     {
         /// <summary>

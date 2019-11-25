@@ -1,22 +1,34 @@
 ﻿using Autofac;
-using CoreCommon.Data.Domain.Config;
-using CoreCommon.Data.EntityFrameworkBase.Managers;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Reflection;
 
 namespace CoreCommon.Business.Service.IoC
 {
+    /// <summary>
+    /// Dependency helper
+    /// </summary>
     public class DependencyHelper
     {
+        /// <summary>
+        /// Register common types
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="types"></param>
         public static void RegisterCommonTypes(ContainerBuilder builder, params Type[] types)
         {
             var assemblies = types.Select(x => x.GetTypeInfo().Assembly);
             RegisterCommonTypes(builder, assemblies.ToArray());
         }
 
+        /// <summary>
+        /// Register common types in assemblies.
+        /// Controller, Manager, Filter => asSelf
+        /// Repository, BusinessLogic => asImplementedInterfaces
+        /// DbContext => asSelf
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="assemblies"></param>
         public static void RegisterCommonTypes(ContainerBuilder builder, params Assembly[] assemblies)
         {
             foreach (var assembly in assemblies)

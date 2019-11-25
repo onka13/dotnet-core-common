@@ -1,5 +1,8 @@
 ﻿namespace CoreCommon.Data.Domain.Business
 {
+    /// <summary>
+    /// Base service result codes
+    /// </summary>
     public class ServiceResultCode
     {
         public const int Created = 12;

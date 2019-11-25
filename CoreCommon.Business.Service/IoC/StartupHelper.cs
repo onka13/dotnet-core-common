@@ -5,8 +5,19 @@ using System;
 
 namespace CoreCommon.Business.Service.Helpers
 {
+    /// <summary>
+    /// Startup helpers
+    /// </summary>
     public class StartupHelper
     {
+        /// <summary>
+        /// Creates host.
+        /// </summary>
+        /// <typeparam name="TStartupBase">Startup class</typeparam>
+        /// <param name="args">Arguments</param>
+        /// <param name="startup">Startup class instance</param>
+        /// <param name="isWeb">If environment is web patform</param>
+        /// <returns></returns>
         public static IHostBuilder CreateHostBuilder<TStartupBase>(string[] args, TStartupBase startup = null, bool isWeb = false) where TStartupBase : StartupBase
         {
             if (startup == null)

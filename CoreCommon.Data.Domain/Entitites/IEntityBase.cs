@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CoreCommon.Data.Domain.Entitites
+﻿namespace CoreCommon.Data.Domain.Entitites
 {
+    /// <summary>
+    /// Base entity interface
+    /// </summary>
     public interface IEntityBase
     {
     }

@@ -7,11 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CoreCommon.Business.Service.IoC
 {
+    /// <summary>
+    /// Startup base class
+    /// </summary>
     public class StartupBase
     {
         public IConfiguration Configuration { get; set;  }
