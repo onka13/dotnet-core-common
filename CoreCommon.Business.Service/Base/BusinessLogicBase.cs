@@ -9,9 +9,9 @@ namespace CoreCommon.Business.Service.Base
     /// Business logic base class
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class BusinessLogicBase<TEntity> : IBusinessLogicBase<TEntity>
+    public abstract class BusinessLogicBase<TEntity, TRepository> : IBusinessLogicBase<TEntity> where TRepository : IRepositoryBase<TEntity>
     {
-        public IRepositoryBase<TEntity> Repository { get; set; }
+        public abstract TRepository Repository { get; set; }
 
         public void SetRef(string refId)
         {

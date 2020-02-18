@@ -29,6 +29,9 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
         /// </summary>
         private System.Data.Common.DbConnection _connection;
 
+        public string Provider { get; set; }
+        public string ConnectionString { get; set; }
+
         public DbContextBase()
         {
             RefId = Guid.NewGuid().ToString();
@@ -43,30 +46,35 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
         {
             base.OnConfiguring(optionsBuilder);
             //optionsBuilder.UseLazyLoadingProxies(false);
-            string provider = Configuration["AppSettings:" + Name + "Provider"];
-            string connectionString = Configuration["ConnectionStrings:" + Name];
+            if (string.IsNullOrEmpty(Provider))
+            {
+                Provider = Configuration["AppSettings:" + Name + "Provider"];
+                ConnectionString = Configuration["ConnectionStrings:" + Name];
+            }
 
-            if (provider != null && provider.Contains("mysql"))
+            Provider = Provider?.ToLower() ?? "";
+
+            if (Provider.Contains("mysql"))
             {
                 if (_connection != null)
                     optionsBuilder.UseMySQL(_connection);
                 else
-                    optionsBuilder.UseMySQL(connectionString);
+                    optionsBuilder.UseMySQL(ConnectionString);
             }
-            else if (provider != null && provider.Contains("postgresql"))
+            else if (Provider.Contains("postgresql"))
             {
                 if (_connection != null)
                     optionsBuilder.UseNpgsql(_connection);
                 else
-                    optionsBuilder.UseNpgsql(connectionString);
+                    optionsBuilder.UseNpgsql(ConnectionString);
             }
             else
             {
                 if (_connection != null)
                     optionsBuilder.UseSqlServer(_connection);
                 else
-                    optionsBuilder.UseSqlServer(connectionString);
-            }
+                    optionsBuilder.UseSqlServer(ConnectionString);
+            }            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

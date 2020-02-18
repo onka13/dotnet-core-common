@@ -256,7 +256,7 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
 
         public virtual int Execute(string query, params object[] parameters)
         {
-            return GetDbContext().Database.ExecuteSqlRaw(query, parameters);
+            return GetDbContext().Database.ExecuteSqlCommand(query, parameters);
         }
 
         public ServiceResult<T1> DoTransactionIfNot<T1>(Func<string, T1> func)

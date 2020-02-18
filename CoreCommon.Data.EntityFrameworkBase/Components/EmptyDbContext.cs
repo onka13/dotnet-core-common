@@ -14,5 +14,13 @@ namespace CoreCommon.Data.EntityFrameworkBase.Components
         {
             _name = name;
         }
+
+        public static EmptyDbContext Init(string provider, string connectionString)
+        {
+            var context = new EmptyDbContext();
+            context.Provider = provider;
+            context.ConnectionString = connectionString;
+            return context;
+        }
     }
 }
