@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace CoreCommon.Business.Service.IoC
+namespace CoreCommon.Business.Service.Helpers
 {
     /// <summary>
     /// Dependency helper

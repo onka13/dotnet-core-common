@@ -1,7 +1,9 @@
 ﻿using Autofac.Extensions.DependencyInjection;
-using CoreCommon.Business.Service.IoC;
+using CoreCommon.Business.Service.Base;
 using Microsoft.Extensions.Hosting;
 using System;
+using Microsoft.Extensions.DependencyInjection;
+using CoreCommon.Business.Service.Helpers;
 
 namespace CoreCommon.Business.Service.Helpers
 {

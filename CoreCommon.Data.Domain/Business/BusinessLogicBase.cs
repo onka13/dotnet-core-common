@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace CoreCommon.Business.Service.Base
+namespace CoreCommon.Data.Domain.Business
 {
     /// <summary>
     /// Business logic base class

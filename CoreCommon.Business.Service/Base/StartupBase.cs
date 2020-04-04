@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using CoreCommon.Business.Service.Helpers;
 using CoreCommon.Data.Domain.Config;
 using CoreCommon.Data.EntityFrameworkBase.Managers;
 using Microsoft.Extensions.Configuration;
@@ -8,14 +9,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace CoreCommon.Business.Service.IoC
+namespace CoreCommon.Business.Service.Base
 {
     /// <summary>
     /// Startup base class
     /// </summary>
-    public class StartupBase
+    public abstract class StartupBase
     {
-        public IConfiguration Configuration { get; set;  }
+        public IConfiguration Configuration { get; set; }
         public IHostEnvironment Environment { get; set; }
         public ILifetimeScope AutofacContainer { get; set; }
 
