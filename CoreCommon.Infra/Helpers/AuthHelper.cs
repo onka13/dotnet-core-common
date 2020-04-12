@@ -4,6 +4,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace CoreCommon.Infra.Helpers
@@ -124,6 +125,146 @@ namespace CoreCommon.Infra.Helpers
                 //throw ex;
             }
             return default(T);
+        }
+
+        // https://samueleresca.net/2016/12/developing-token-authentication-using-asp-net-core/
+
+        public static string EncryptTicket(string name, string secretKey, int expiryInMinutes, object userData)
+        {
+            var serializedUserData = ConversionHelper.Serialize(userData);
+
+            DateTime issuedAt = DateTime.UtcNow;
+            DateTime expires = DateTime.UtcNow.AddMinutes(expiryInMinutes);
+
+            //http://stackoverflow.com/questions/18223868/how-to-encrypt-jwt-security-token
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, name),
+                new Claim(JwtRegisteredClaimNames.Nonce, serializedUserData),
+            });
+            var now = DateTime.UtcNow;
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var securityKey2 = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var ep = new EncryptingCredentials(securityKey2, SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256);
+
+            //create the jwt
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                //Issuer = issuer,
+                //Audience = issuer,
+                Subject = claimsIdentity,
+                Expires = expires,
+                //NotBefore = issuedAt,
+                //IssuedAt = issuedAt,
+                SigningCredentials = signingCredentials,
+                //EncryptingCredentials = ep
+            };
+
+            var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
+
+            //var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            //var token2 = new JwtSecurityToken(issuer,
+            //              issuer,
+            //              claimsIdentity.Claims,
+            //              expires: DateTime.Now.AddMinutes(30),
+            //              signingCredentials: signingCredentials);
+
+            return tokenHandler.WriteToken(token);
+        }
+
+        public static T DecryptTicket<T>(string token, string secretKey, out bool isExpired)
+        {
+            isExpired = false;
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var signingKey2 = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            try
+            {
+                SecurityToken validToken;
+                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                TokenValidationParameters validationParameters = new TokenValidationParameters()
+                {
+                    //ValidAudience = issuer,
+                    //ValidIssuer = issuer,
+                    ValidateIssuerSigningKey = true,
+                    //ValidateLifetime = true,
+                    //LifetimeValidator = this.LifetimeValidator,
+                    IssuerSigningKey = signingKey,
+                    //TokenDecryptionKey = signingKey2,
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+
+                var principal = handler.ValidateToken(token, validationParameters, out validToken);
+
+                var validJwt = validToken as JwtSecurityToken;
+
+                if (validJwt == null)
+                {
+                    return default(T);
+                }
+
+                //if (!validJwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.Ordinal))
+                //{
+                //    return default(T);
+                //    //throw new ArgumentException($"Algorithm must be '{SecurityAlgorithms.HmacSha256}'");
+                //}
+
+                isExpired = validJwt.ValidTo < DateTime.UtcNow;
+                var userData = validJwt.Claims.ToList().FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Nonce)?.Value;
+                if (string.IsNullOrWhiteSpace(userData))
+                {
+                    return default(T);
+                }
+                return ConversionHelper.Deserialize<T>(userData);
+            }
+            catch (SecurityTokenExpiredException ex)
+            {
+                isExpired = true;
+            }
+            catch (Exception ex)
+            {
+                //throw ex;
+            }
+            return default(T);
+        }
+
+        public static T DecryptTicket<T>(string encryptedTicket, string secretKey)
+        {
+            bool isExpired;
+            var data = DecryptTicket<T>(encryptedTicket, secretKey, out isExpired);
+            return isExpired ? default(T) : data;
+        }
+
+        public static string CreateSalt()
+        {
+            byte[] randomBytes = new byte[128 / 8];
+            using (var generator = RandomNumberGenerator.Create())
+            {
+                generator.GetBytes(randomBytes);
+                return Convert.ToBase64String(randomBytes);
+            }
+        }
+
+        public static string HashPassword(string value)
+        {
+            return HashPassword(value, "ZrrNNnmfuABsPNuVQ6YeJK==");
+        }
+
+        public static bool ValidatePassword(string value, string hash)
+        {
+            return ValidateHash(value, "ZrrNNnmfuABsPNuVQ6YeJK==", hash);
+        }
+
+        public static string Sha256Hash(string text)
+        {
+            SHA256 sha = new SHA256Managed();
+            var hash = sha.ComputeHash(Encoding.Unicode.GetBytes(text));
+            return Encoding.Unicode.GetString(hash);
         }
     }
 }
