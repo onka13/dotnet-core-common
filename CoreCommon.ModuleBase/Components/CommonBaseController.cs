@@ -25,7 +25,7 @@ namespace CoreCommon.ModuleBase.Components
             base.OnActionExecuting(context);
         }
 
-        public string GetIpAddress()
+        protected string GetIpAddress()
         {
             return HttpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
         }
@@ -40,25 +40,25 @@ namespace CoreCommon.ModuleBase.Components
             return null;
         }
 
-        public IActionResult SuccessResponse(object msg = null)
+        protected IActionResult SuccessResponse(object msg = null)
         {
             var response = ServiceResult<object>.Instance.SuccessResult(msg);
             return Json(response);
         }
 
-        public IActionResult ErrorResponse(int responseCode = 2, string message = "")
+        protected IActionResult ErrorResponse(int responseCode = 2, string message = "")
         {
             var response = ServiceResult<object>.Instance.ErrorResult(responseCode, message);
             return Json(response);
         }
 
-        public IActionResult ResponseNextPage<T>(ServiceResult<List<T>> result, int take)
+        protected IActionResult ResponseNextPage<T>(ServiceResult<List<T>> result, int take)
         {
             var response = ServiceListMoreResult<T>.Instance.SuccessResult(result.Value, take);
             return Json(response);
         }
 
-        public IActionResult ResponseNextPage<T>(List<T> result, int take)
+        protected IActionResult ResponseNextPage<T>(List<T> result, int take)
         {
             var response = ServiceListMoreResult<T>.Instance.SuccessResult(result, take);
             return Json(response);
