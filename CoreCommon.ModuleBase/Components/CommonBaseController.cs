@@ -7,10 +7,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace CoreCommon.ModuleBase.Components
 {
@@ -62,30 +60,6 @@ namespace CoreCommon.ModuleBase.Components
         {
             var response = ServiceListMoreResult<T>.Instance.SuccessResult(result, take);
             return Json(response);
-        }
-
-        protected JsonResult Json<T>(T content)
-        {
-            var serializerSettings = new JsonSerializerSettings();
-            serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver()
-            {
-                //NamingStrategy = new CamelCaseNamingStrategy
-                //{
-                //    ProcessDictionaryKeys = true,
-                //    ProcessExtensionDataNames = true,
-                //    OverrideSpecifiedNames = true
-                //}
-            };
-            serializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            serializerSettings.NullValueHandling = NullValueHandling.Ignore;
-#if DEBUG
-            // Pretty json for developers.
-            serializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
-#else
-            serializerSettings.Formatting = Formatting.None;
-#endif
-
-            return base.Json(content, serializerSettings);
         }
 
         /// <summary>
