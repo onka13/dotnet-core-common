@@ -17,5 +17,12 @@ namespace CoreCommon.Infra.Helpers
         {
             return Regex.Replace(txt, @"[^A-Z]+", "");
         }
+
+        public static string Trim(string s, string trimmer)
+        {
+            if (string.IsNullOrEmpty(s) || string.IsNullOrEmpty(trimmer) || !s.EndsWith(trimmer, StringComparison.OrdinalIgnoreCase))
+                return s;
+            return s.Substring(0, s.Length - trimmer.Length);
+        }
     }
 }
