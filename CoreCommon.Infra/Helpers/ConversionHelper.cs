@@ -4,6 +4,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CoreCommon.Infra.Helpers
 {
@@ -112,6 +113,33 @@ namespace CoreCommon.Infra.Helpers
 
                 }
                 return default(T);
+            }
+        }
+
+        /// <summary>
+        /// Convert an object to a byte array
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>        
+        public static byte[] ObjectToByteArray(object obj)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (var stream = new MemoryStream())
+            {
+                formatter.Serialize(stream, obj);
+                return stream.ToArray();
+            }
+        }
+
+        public static T ByteArrayTo<T>(byte[] body)
+        {
+            using (var stream = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                stream.Write(body, 0, body.Length);
+                stream.Seek(0, SeekOrigin.Begin);
+                var obj = formatter.Deserialize(stream);
+                return (T)obj;
             }
         }
     }

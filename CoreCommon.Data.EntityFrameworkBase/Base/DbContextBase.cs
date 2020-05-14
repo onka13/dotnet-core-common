@@ -52,6 +52,12 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
                 ConnectionString = Configuration["ConnectionStrings:" + Name];
             }
 
+            if (!string.IsNullOrEmpty(Configuration["ConnectionStrings_" + Name]))
+            {
+                Provider = Configuration["AppSettings_" + Name + "Provider"];
+                ConnectionString = Configuration["ConnectionStrings_" + Name];
+            }   
+
             Provider = Provider?.ToLower() ?? "";
 
             if (Provider.Contains("mysql"))
