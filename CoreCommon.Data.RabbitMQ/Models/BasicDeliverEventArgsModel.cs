@@ -44,7 +44,7 @@ namespace CoreCommon.Data.RabbitMQ.Models
         }
         
         /// <summary>
-        /// Convert data to <
+        /// Convert data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
