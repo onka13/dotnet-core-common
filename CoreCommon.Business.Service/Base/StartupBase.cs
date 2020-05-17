@@ -37,7 +37,7 @@ namespace CoreCommon.Business.Service.Base
                    .InstancePerLifetimeScope();
         }
 
-        public void ConfigureAppConfiguration(IConfigurationBuilder config, IHostEnvironment env)
+        public virtual void ConfigureAppConfiguration(IConfigurationBuilder config, IHostEnvironment env)
         {
             Environment = env;
 
@@ -47,7 +47,7 @@ namespace CoreCommon.Business.Service.Base
             config.AddEnvironmentVariables();
         }
 
-        public void ConfigureLogging(IConfiguration configuration, ILoggingBuilder logging)
+        public virtual void ConfigureLogging(IConfiguration configuration, ILoggingBuilder logging)
         {
             Configuration = configuration;
 

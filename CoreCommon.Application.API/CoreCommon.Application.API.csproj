@@ -14,4 +14,8 @@
     <ProjectReference Include="..\CoreCommon.Business.Service\CoreCommon.Business.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
 </Project>
