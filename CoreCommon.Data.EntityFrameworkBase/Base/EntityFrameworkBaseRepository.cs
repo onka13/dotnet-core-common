@@ -15,7 +15,9 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TDbContext"></typeparam>
-    public class EntityFrameworkBaseRepository<TEntity, TDbContext> where TEntity : class, IEntityBase, new() where TDbContext : DbContext
+    public class EntityFrameworkBaseRepository<TEntity, TDbContext> 
+        : RepositoryBase<TEntity>, IEntityFrameworkBaseRepository<TEntity> 
+        where TEntity : class, IEntityBase, new() where TDbContext : DbContext
     {
         public string RefId { get; private set; }
 
@@ -27,10 +29,9 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             System.Diagnostics.Debug.WriteLine("XXX EFBaseRepo " + typeof(TEntity).Name + " " + RefId);
         }
 
-        public void SetRefId(string _ref)
+        public void SetRefId(string refId)
         {
-            System.Diagnostics.Debug.WriteLine("XXX EFBaseRepo REF CHANGED " + typeof(TEntity).Name + " " + RefId + "=>" + _ref);
-            RefId = _ref;
+            RefId = refId;
         }
 
         public string GetRefId()
@@ -162,20 +163,6 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             //return SetState(entity, EntityState.Modified);
         }
 
-        public List<object> SkipTake(IEnumerable<object> result, int skip, int take, out long total)
-        {
-            if (take > 0)
-            {
-                total = result.Count();
-                result = result.Skip(skip).Take(take);
-            }
-            else
-            {
-                total = 0;
-            }
-            return result.Select(x => (object)x).ToList();
-        }
-
         protected int SetState(TEntity entity, EntityState state)
         {
             SetStateOnly(entity, state);
@@ -205,45 +192,45 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             return typeof(TEntity).Name.Replace("Entity", "");
         }
 
-        public int BulkInsert(List<TEntity> entityList)
+        public int BulkInsert(List<TEntity> entities)
         {
-            if (entityList.Count == 0) return 0;
+            if (entities.Count == 0) return 0;
 
-            GetDbSet().AddRange(entityList);
+            GetDbSet().AddRange(entities);
             return Save();
         }
 
-        public int BulkUpdate(List<TEntity> entityList)
+        public int BulkUpdate(List<TEntity> entities)
         {
-            if (entityList.Count == 0) return 0;
+            if (entities.Count == 0) return 0;
 
-            foreach (var entity in entityList)
+            foreach (var entity in entities)
             {
                 SetStateOnly(entity, EntityState.Modified);
             }
             return Save();
         }
 
-        public int BulkDelete(List<TEntity> entityList)
+        public int BulkDelete(List<TEntity> entities)
         {
-            if (entityList.Count == 0) return 0;
+            if (entities.Count == 0) return 0;
 
-            foreach (var entity in entityList)
+            foreach (var entity in entities)
             {
                 SetStateOnly(entity, EntityState.Deleted);
             }
             return Save();
         }
 
-        public int BulkUpdateOnly(List<TEntity> entityList, params Expression<Func<TEntity, object>>[] properties)
+        public int BulkUpdateOnly(List<TEntity> entities, params Expression<Func<TEntity, object>>[] properties)
         {
-            if (entityList.Count == 0) return 0;
+            if (entities.Count == 0) return 0;
             if (properties == null || properties.Length == 0)
             {
-                return BulkUpdate(entityList);
+                return BulkUpdate(entities);
             }
 
-            foreach (var entity in entityList)
+            foreach (var entity in entities)
             {
                 var entry = SetStateOnly(entity, EntityState.Modified);
                 foreach (var property in properties)
@@ -311,6 +298,11 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
         public bool HasTransaction(string newRefId = null)
         {
             return Manager.HasTransaction<TDbContext>(newRefId ?? RefId);
+        }
+
+        public IQueryable<TEntity> GetQueryable()
+        {
+            return GetDbSet().AsQueryable();
         }
     }
 }
