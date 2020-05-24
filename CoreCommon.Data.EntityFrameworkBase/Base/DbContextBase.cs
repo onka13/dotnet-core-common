@@ -46,17 +46,20 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
         {
             base.OnConfiguring(optionsBuilder);
             //optionsBuilder.UseLazyLoadingProxies(false);
-            if (string.IsNullOrEmpty(Provider))
+            if (Configuration != null)
             {
-                Provider = Configuration["AppSettings:" + Name + "Provider"];
-                ConnectionString = Configuration["ConnectionStrings:" + Name];
-            }
+                if (string.IsNullOrEmpty(Provider))
+                {
+                    Provider = Configuration["AppSettings:" + Name + "Provider"];
+                    ConnectionString = Configuration["ConnectionStrings:" + Name];
+                }
 
-            if (!string.IsNullOrEmpty(Configuration["ConnectionStrings_" + Name]))
-            {
-                Provider = Configuration["AppSettings_" + Name + "Provider"];
-                ConnectionString = Configuration["ConnectionStrings_" + Name];
-            }   
+                if (!string.IsNullOrEmpty(Configuration["ConnectionStrings_" + Name]))
+                {
+                    Provider = Configuration["AppSettings_" + Name + "Provider"];
+                    ConnectionString = Configuration["ConnectionStrings_" + Name];
+                }
+            }             
 
             Provider = Provider?.ToLower() ?? "";
 

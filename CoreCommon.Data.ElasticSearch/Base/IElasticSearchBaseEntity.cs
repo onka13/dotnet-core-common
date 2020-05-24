@@ -4,7 +4,7 @@
     /// Default elastic search entity interface
     /// </summary>
     /// <typeparam name="TPrimaryKey">Primary Key Type</typeparam>
-    public interface IElasticSearchEntityBase<TPrimaryKey>
+    public interface IElasticSearchBaseEntity<TPrimaryKey>
     {
         TPrimaryKey Id { get; set; }
     }

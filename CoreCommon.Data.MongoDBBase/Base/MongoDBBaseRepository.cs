@@ -1,12 +1,11 @@
 ﻿using CoreCommon.Data.Domain.Business;
 using CoreCommon.Data.Domain.Config;
-using CoreCommon.Data.Domain.Entitites;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using MongoDB.Driver;
 using System.Linq;
-using MongoDB.Driver.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace CoreCommon.Data.MongoDBBase.Base
 {
@@ -16,20 +15,27 @@ namespace CoreCommon.Data.MongoDBBase.Base
     /// <typeparam name="TDocument"></typeparam>
     public abstract class MongoDBBaseRepository<TDocument> 
         : RepositoryBase<TDocument>, IMongoDBBaseRepository<TDocument> 
-        where TDocument : class, IMongoDbEntity<TDocument>
+        where TDocument : class, IMongoDBBaseEntity<TDocument>
     {
         private readonly IMongoCollection<TDocument> collection;
-        public abstract string CollectionName { get; }
+        public string CollectionName { get; }
 
-        public MongoDBBaseRepository(DatabaseConfig settings)
+        /// <summary>
+        /// Name of the context
+        /// </summary>
+        public abstract string ConnectionName { get; }
+        public IConfiguration Configuration { get; set; }
+
+        public MongoDBBaseRepository()
         {
-            var client = new MongoClient(settings.ConnectionString);
-            var database = client.GetDatabase(settings.DatabaseName);
-
+            var client = new MongoClient(Configuration[ConnectionName + ":ConnectionString"]);
+            var database = client.GetDatabase(Configuration[ConnectionName + ":DatabaseName"]);
+            var collectionAttribute = (CollectionAttribute)typeof(TDocument).GetCustomAttributes(typeof(CollectionAttribute), false).FirstOrDefault();
+            CollectionName = collectionAttribute.Name;
             collection = database.GetCollection<TDocument>(CollectionName);
         }
 
-        public IMongoQueryable<TDocument> GetQueryable()
+        public IQueryable<TDocument> GetQueryable()
         {
             return collection.AsQueryable();
         }
