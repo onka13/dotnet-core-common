@@ -13,11 +13,24 @@ namespace CoreCommon.Data.MongoDBBase.Base
     /// MongoDB base repository
     /// </summary>
     /// <typeparam name="TDocument"></typeparam>
-    public abstract class MongoDBBaseRepository<TDocument> 
-        : RepositoryBase<TDocument>, IMongoDBBaseRepository<TDocument> 
+    public abstract class MongoDBBaseRepository<TDocument>
+        : RepositoryBase<TDocument>, IMongoDBBaseRepository<TDocument>
         where TDocument : class, IMongoDBBaseEntity<TDocument>
     {
-        private readonly IMongoCollection<TDocument> collection;
+        IMongoCollection<TDocument> _collection;
+        IMongoCollection<TDocument> Collection
+        {
+            get
+            {
+                if(_collection == null)
+                {
+                    var client = new MongoClient(Configuration[ConnectionName + ":ConnectionString"]);
+                    var database = client.GetDatabase(Configuration[ConnectionName + ":DatabaseName"]);
+                    _collection = database.GetCollection<TDocument>(CollectionName);
+                }
+                return _collection;
+            }
+        }
         public string CollectionName { get; }
 
         /// <summary>
@@ -28,58 +41,55 @@ namespace CoreCommon.Data.MongoDBBase.Base
 
         public MongoDBBaseRepository()
         {
-            var client = new MongoClient(Configuration[ConnectionName + ":ConnectionString"]);
-            var database = client.GetDatabase(Configuration[ConnectionName + ":DatabaseName"]);
             var collectionAttribute = (CollectionAttribute)typeof(TDocument).GetCustomAttributes(typeof(CollectionAttribute), false).FirstOrDefault();
             CollectionName = collectionAttribute.Name;
-            collection = database.GetCollection<TDocument>(CollectionName);
         }
 
         public IQueryable<TDocument> GetQueryable()
         {
-            return collection.AsQueryable();
+            return Collection.AsQueryable();
         }
 
         public IEnumerable<TDocument> GetAll()
         {
-            return collection.Find(x => true).ToList();
+            return Collection.Find(x => true).ToList();
         }
 
         public TDocument Get(Expression<Func<TDocument, bool>> filter)
         {
-            return collection.Find(filter).FirstOrDefault();
+            return Collection.Find(filter).FirstOrDefault();
         }
 
         public TDocument Add(TDocument entity)
         {
-            collection.InsertOne(entity);
+            Collection.InsertOne(entity);
             return entity;
         }
 
         public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate)
         {
-            return collection.Find(predicate).ToList();
+            return Collection.Find(predicate).ToList();
         }
 
         public TDocument GetBy(Expression<Func<TDocument, bool>> predicate)
         {
-            return collection.Find(predicate).FirstOrDefault();
+            return Collection.Find(predicate).FirstOrDefault();
         }
 
         public int Delete(TDocument entity)
         {
-            return DeleteBy(entity.PrimaryPredicate);
+            return DeleteBy(entity.PrimaryPredicate());
         }
 
         public int DeleteBy(Expression<Func<TDocument, bool>> predicate)
         {
-            var result = collection.DeleteOne(predicate);
+            var result = Collection.DeleteOne(predicate);
             return result.IsAcknowledged ? (int)result.DeletedCount : 0;
         }
 
         public int Edit(TDocument entity)
         {
-            var result = collection.ReplaceOne(entity.PrimaryPredicate, entity);
+            var result = Collection.ReplaceOne(entity.PrimaryPredicate(), entity);
             return result.IsAcknowledged ? (int)result.ModifiedCount : 0;
         }
 
@@ -96,28 +106,28 @@ namespace CoreCommon.Data.MongoDBBase.Base
             {
                 def = def.Set(properties[i], properties[i].Compile().Invoke(entity));
             }
-            var result = collection.UpdateOne(entity.PrimaryPredicate, def);
+            var result = Collection.UpdateOne(entity.PrimaryPredicate(), def);
             return result.IsAcknowledged ? (int)result.ModifiedCount : 0;
         }
 
         public int BulkInsert(List<TDocument> entities)
         {
             if (entities.Count == 0) return 0;
-            var res = collection.BulkWrite(entities.Select(x => new InsertOneModel<TDocument>(x)));
+            var res = Collection.BulkWrite(entities.Select(x => new InsertOneModel<TDocument>(x)));
             return (int)res.InsertedCount;
         }
 
         public int BulkUpdate(List<TDocument> entities)
         {
             if (entities.Count == 0) return 0;
-            var res = collection.BulkWrite(entities.Select(x => new ReplaceOneModel<TDocument>(x.PrimaryPredicate, x) { IsUpsert = true }));
+            var res = Collection.BulkWrite(entities.Select(x => new ReplaceOneModel<TDocument>(x.PrimaryPredicate(), x) { IsUpsert = true }));
             return (int)res.ModifiedCount;
         }
 
         public int BulkDelete(List<TDocument> entities)
         {
             if (entities.Count == 0) return 0;
-            var res = collection.BulkWrite(entities.Select(x => new DeleteOneModel<TDocument>(x.PrimaryPredicate)));
+            var res = Collection.BulkWrite(entities.Select(x => new DeleteOneModel<TDocument>(x.PrimaryPredicate())));
             return (int)res.DeletedCount;
         }
 
@@ -125,14 +135,14 @@ namespace CoreCommon.Data.MongoDBBase.Base
         {
             if (properties.Length == 0) return 0;
 
-            var res = collection.BulkWrite(entities.Select(entity =>
+            var res = Collection.BulkWrite(entities.Select(entity =>
             {
                 var def = new UpdateDefinitionBuilder<TDocument>().Set(properties[0], properties[0].Compile().Invoke(entity));
                 for (int i = 1; i < properties.Length; i++)
                 {
                     def = def.Set(properties[i], properties[i].Compile().Invoke(entity));
                 }
-                return new UpdateManyModel<TDocument>(entity.PrimaryPredicate, def) { IsUpsert = true };
+                return new UpdateManyModel<TDocument>(entity.PrimaryPredicate(), def) { IsUpsert = true };
             }));
             return (int)(res.ModifiedCount + res.InsertedCount);
         }

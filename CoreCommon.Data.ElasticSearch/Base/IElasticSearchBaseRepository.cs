@@ -11,6 +11,7 @@ namespace CoreCommon.Data.ElasticSearch.Base
         int DeleteBy(TPrimaryKey id);
         TDocument GetBy(TPrimaryKey id);
         List<TDocument> GetMany(List<TPrimaryKey> ids);
+        int EditOnly(TPrimaryKey id, object partialEntity);
         List<TDocument> Search(int from, int size, Func<QueryContainerDescriptor<TDocument>, QueryContainer> query, Expression<Func<TDocument, object>>[] selectFields, Field sortField, bool isAscending, out long _total);
     }
 }

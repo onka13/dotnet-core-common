@@ -1,4 +1,6 @@
-﻿namespace CoreCommon.Data.ElasticSearch.Base
+﻿using Nest;
+
+namespace CoreCommon.Data.ElasticSearch.Base
 {
     /// <summary>
     /// Default elastic search entity interface
@@ -6,6 +8,7 @@
     /// <typeparam name="TPrimaryKey">Primary Key Type</typeparam>
     public interface IElasticSearchBaseEntity<TPrimaryKey>
     {
-        TPrimaryKey Id { get; set; }
+        //TPrimaryKey Id { get; set; }
+        string Id { get; set; }
     }
 }

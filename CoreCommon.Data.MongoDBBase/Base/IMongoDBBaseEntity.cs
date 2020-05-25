@@ -9,6 +9,6 @@ namespace CoreCommon.Data.MongoDBBase.Base
     /// <typeparam name="TPrimaryKey">Primary Key Type</typeparam>
     public interface IMongoDBBaseEntity<TDocument>
     {
-        Expression<Func<TDocument, bool>> PrimaryPredicate { get; }
+        Expression<Func<TDocument, bool>> PrimaryPredicate();
     }
 }

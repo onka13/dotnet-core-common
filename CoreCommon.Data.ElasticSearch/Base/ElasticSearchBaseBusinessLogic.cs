@@ -4,7 +4,8 @@ using System.Collections.Generic;
 namespace CoreCommon.Data.ElasticSearch.Base
 {
     public abstract class ElasticSearchBaseBusinessLogic<TDocument, TPrimaryKey, TRepository> 
-        : CrudBusinessLogicBase<TDocument, TRepository> 
+        : CrudBusinessLogicBase<TDocument, TRepository>,
+        IElasticSearchBaseBusinessLogic<TDocument, TPrimaryKey> 
         where TRepository : IElasticSearchBaseRepository<TDocument, TPrimaryKey>
         where TDocument : class, new()
     {
@@ -17,8 +18,19 @@ namespace CoreCommon.Data.ElasticSearch.Base
                 response.SuccessResult(form, ServiceResultCode.Deleted);
             }
             return response;
-        }        
-        
+        }
+
+        public ServiceResult<int> EditOnly(TPrimaryKey id, object partialEntity)
+        {
+            var response = ServiceResult<int>.Instance.ErrorResult(ServiceResultCode.Error);
+            var form = Repository.EditOnly(id, partialEntity);
+            if (form > 0)
+            {
+                response.SuccessResult(form, ServiceResultCode.Updated);
+            }
+            return response;
+        }
+
         public ServiceResult<TDocument> GetBy(TPrimaryKey id)
         {
             var response = ServiceResult<TDocument>.Instance.ErrorResult(ServiceResultCode.Error);

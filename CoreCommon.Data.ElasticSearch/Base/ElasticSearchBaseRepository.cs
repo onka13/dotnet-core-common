@@ -22,31 +22,46 @@ namespace CoreCommon.Data.ElasticSearch.Base
         /// </summary>
         public abstract string ConnectionName { get; }
 
+        public string IndexName { get; }
+
         /// <summary>
         /// Autowired property for getting appsettings
         /// </summary>
         public IConfiguration Configuration { get; set; }
 
-        public IElasticClient ElasticClient { get; set; }
+        private IElasticClient _elasticClient;
+        public IElasticClient ElasticClient
+        {
+            get
+            {
+                if (_elasticClient == null)
+                {
+                    var url = Configuration[ConnectionName + ":Url"];
+                    //var defaultIndex = Configuration[ConnectionName + ":Index"];
+                    var settings = new ConnectionSettings(new Uri(url));
+                    settings.DefaultIndex(IndexName);
+                    _elasticClient = new ElasticClient(settings);
+
+                    var createIndexResponse = _elasticClient.Indices.Create(IndexName, c => c.Map<TDocument>(m => m.AutoMap<TDocument>()));
+                }
+                return _elasticClient;
+            }
+        }
 
         public ElasticSearchBaseRepository()
         {
-            var url = Configuration[ConnectionName + ":Url"];
-            var defaultIndex = Configuration[ConnectionName + ":Index"];
-
-            var settings = new ConnectionSettings(new Uri(url)).DefaultIndex(defaultIndex);
-
-            ElasticClient = new ElasticClient(settings);
+            var attribute = (IndexConfigAttribute)typeof(TDocument).GetCustomAttributes(typeof(IndexConfigAttribute), false).FirstOrDefault();
+            IndexName = attribute.Name;
         }
 
         public TDocument Add(TDocument entity)
         {
-            var indexResponse = ElasticClient.IndexDocument(entity);
+            entity.Id = Guid.NewGuid().ToString();
+            var indexResponse = ElasticClient.Index(entity, x => x.Id(entity.Id));
             if (indexResponse.Result != Result.Created)
             {
                 return null;
             }
-            entity.Id = (TPrimaryKey)Convert.ChangeType(indexResponse.Id, typeof(TPrimaryKey));
             return entity;
         }
 
@@ -78,13 +93,19 @@ namespace CoreCommon.Data.ElasticSearch.Base
 
         public int Delete(TDocument entity)
         {
-            var deleteResponse = ElasticClient.Delete<TDocument>(entity);
+            var deleteResponse = ElasticClient.Delete<TDocument>(entity.Id);
             return deleteResponse.Result == Result.Deleted ? 1 : 0;
         }
 
         public int Edit(TDocument entity)
         {
-            var updateResponse = ElasticClient.Update(new UpdateDescriptor<TDocument, TDocument>(entity));
+            var updateResponse = ElasticClient.Update<TDocument>(entity.Id, x => x.Doc(entity));
+            return updateResponse.Result == Result.Updated ? 1 : 0;
+        }
+
+        public int EditOnly(TPrimaryKey id, object partialEntity)
+        {
+            var updateResponse = ElasticClient.Update<object>(id, x => x.Index(IndexName).Doc(partialEntity));
             return updateResponse.Result == Result.Updated ? 1 : 0;
         }
 
@@ -112,6 +133,7 @@ namespace CoreCommon.Data.ElasticSearch.Base
         public List<TDocument> Search(int from, int size, Func<QueryContainerDescriptor<TDocument>, QueryContainer> query, Expression<Func<TDocument, object>>[] selectFields, Field sortField, bool isAscending, out long _total)
         {
             var result = ElasticClient.Search<TDocument>(s => s
+                .Index<TDocument>()
                 .From(from)
                 .Size(size)
                 .Query(query)
