@@ -37,12 +37,17 @@ namespace CoreCommon.Data.ElasticSearch.Base
                 if (_elasticClient == null)
                 {
                     var url = Configuration[ConnectionName + ":Url"];
-                    //var defaultIndex = Configuration[ConnectionName + ":Index"];
+
+                    if (!string.IsNullOrEmpty(Configuration[ConnectionName + "_Url"]))
+                    {
+                        url = Configuration[ConnectionName + "_Url"];
+                    }
+
                     var settings = new ConnectionSettings(new Uri(url));
                     settings.DefaultIndex(IndexName);
                     _elasticClient = new ElasticClient(settings);
 
-                    var createIndexResponse = _elasticClient.Indices.Create(IndexName, c => c.Map<TDocument>(m => m.AutoMap<TDocument>()));
+                    _elasticClient.Indices.Create(IndexName, c => c.Map<TDocument>(m => m.AutoMap<TDocument>()));
                 }
                 return _elasticClient;
             }
@@ -73,7 +78,10 @@ namespace CoreCommon.Data.ElasticSearch.Base
 
         public int BulkInsert(List<TDocument> entities)
         {
-            //var result = ElasticClient.IndexMany(entities);
+            foreach (var entity in entities)
+            {
+                entity.Id = Guid.NewGuid().ToString();
+            }
             var result = ElasticClient.Bulk(b => b.Index<TDocument>().IndexMany(entities));
             if (result.Errors)
             {

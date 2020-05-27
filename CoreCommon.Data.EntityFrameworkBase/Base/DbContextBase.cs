@@ -50,14 +50,14 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             {
                 if (string.IsNullOrEmpty(Provider))
                 {
-                    Provider = Configuration["AppSettings:" + Name + "Provider"];
-                    ConnectionString = Configuration["ConnectionStrings:" + Name];
+                    Provider = Configuration[Name + ":Provider"];
+                    ConnectionString = Configuration[Name + ":ConnectionString"];
                 }
 
-                if (!string.IsNullOrEmpty(Configuration["ConnectionStrings_" + Name]))
+                if (!string.IsNullOrEmpty(Configuration[Name + "_ConnectionString"]))
                 {
-                    Provider = Configuration["AppSettings_" + Name + "Provider"];
-                    ConnectionString = Configuration["ConnectionStrings_" + Name];
+                    Provider = Configuration[Name + "_Provider"];
+                    ConnectionString = Configuration[Name + "_ConnectionString"];
                 }
             }             
 

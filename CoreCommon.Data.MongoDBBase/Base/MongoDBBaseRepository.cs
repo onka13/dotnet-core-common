@@ -24,8 +24,17 @@ namespace CoreCommon.Data.MongoDBBase.Base
             {
                 if(_collection == null)
                 {
-                    var client = new MongoClient(Configuration[ConnectionName + ":ConnectionString"]);
-                    var database = client.GetDatabase(Configuration[ConnectionName + ":DatabaseName"]);
+                    var connectionString = Configuration[ConnectionName + ":ConnectionString"];
+                    var databaseName = Configuration[ConnectionName + ":DatabaseName"];
+
+                    if (!string.IsNullOrEmpty(Configuration[ConnectionName + "_ConnectionString"]))
+                    {
+                        connectionString = Configuration[ConnectionName + "_ConnectionString"];
+                        databaseName = Configuration[ConnectionName + "_DatabaseName"];
+                    }
+
+                    var client = new MongoClient(connectionString);
+                    var database = client.GetDatabase(databaseName);
                     _collection = database.GetCollection<TDocument>(CollectionName);
                 }
                 return _collection;
