@@ -7,10 +7,11 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Configuration;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace CoreTemplateExtensionLibrary.Components
 {
-    public class SolutionHelper
+    public static class SolutionHelper
     {
         private static DTE _dteObj;
         private static List<Project> allProjects;

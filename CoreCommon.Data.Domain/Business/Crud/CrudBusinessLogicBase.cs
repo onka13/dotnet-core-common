@@ -39,7 +39,7 @@ namespace CoreCommon.Data.Domain.Business
             var form = Repository.Edit(entity);
             if (form > 0)
             {
-                response.SuccessResult(form, ServiceResultCode.Created);
+                response.SuccessResult(form, ServiceResultCode.Updated);
             }
             return response;
         }
@@ -61,7 +61,7 @@ namespace CoreCommon.Data.Domain.Business
             var form = Repository.BulkUpdate(entities);
             if (form > 0)
             {
-                response.SuccessResult(form, ServiceResultCode.Created);
+                response.SuccessResult(form, ServiceResultCode.Updated);
             }
             return response;
         }
@@ -72,7 +72,7 @@ namespace CoreCommon.Data.Domain.Business
             var form = Repository.BulkDelete(entities);
             if (form > 0)
             {
-                response.SuccessResult(form, ServiceResultCode.Created);
+                response.SuccessResult(form, ServiceResultCode.Deleted);
             }
             return response;
         }

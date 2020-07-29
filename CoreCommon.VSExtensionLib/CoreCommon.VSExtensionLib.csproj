@@ -60,6 +60,8 @@
   <ItemGroup>
     <Compile Include="Components\SolutionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Components\MessageFilter.cs" />
+    <Compile Include="Components\VsSolution.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="key.snk" />
