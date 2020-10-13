@@ -63,6 +63,9 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
 
             Provider = Provider?.ToLower() ?? "";
 
+            //System.Console.WriteLine("Provider " + Provider);
+            //System.Console.WriteLine("ConnectionString " + ConnectionString);
+
             if (Provider.Contains("mysql"))
             {
                 if (_connection != null)
@@ -70,7 +73,7 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
                 else
                     optionsBuilder.UseMySQL(ConnectionString);
             }
-            else if (Provider.Contains("postgresql"))
+            else if (Provider.Contains("postgres"))
             {
                 if (_connection != null)
                     optionsBuilder.UseNpgsql(_connection);
