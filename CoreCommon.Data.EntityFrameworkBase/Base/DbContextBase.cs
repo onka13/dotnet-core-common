@@ -70,7 +70,7 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
                 else
                     optionsBuilder.UseMySQL(ConnectionString);
             }
-            else if (Provider.Contains("postgresql"))
+            else if (Provider.Contains("postgres"))
             {
                 if (_connection != null)
                     optionsBuilder.UseNpgsql(_connection);
