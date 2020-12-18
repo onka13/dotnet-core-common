@@ -10,8 +10,7 @@ namespace CoreCommon.Data.Domain.Business
     /// <typeparam name="TEntity">Entity Type</typeparam>
     public interface IQueryableBusinessLogicBase<TEntity> : ICrudBusinessLogicBase<TEntity>
     {
-        ServiceResult<IEnumerable<TEntity>> FindBy(Expression<Func<TEntity, bool>> predicate);
-        ServiceResult<IEnumerable<TEntity>> FindAndIncludeBy<TProp>(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, TProp>>[] include);
+        ServiceResult<IEnumerable<TEntity>> FindBy(Expression<Func<TEntity, bool>> predicate);        
         ServiceResult<TEntity> GetBy(Expression<Func<TEntity, bool>> predicate);
         
         ServiceResult<int> DeleteBy(Expression<Func<TEntity, bool>> predicate);

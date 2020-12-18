@@ -17,12 +17,12 @@ namespace CoreCommon.Data.MongoDBBase.Base
         : RepositoryBase<TDocument>, IMongoDBBaseRepository<TDocument>
         where TDocument : class, IMongoDBBaseEntity<TDocument>
     {
-        IMongoCollection<TDocument> _collection;
-        IMongoCollection<TDocument> Collection
+        IMongoDatabase _database;
+        protected IMongoDatabase Database
         {
             get
             {
-                if(_collection == null)
+                if (_database == null)
                 {
                     var connectionString = Configuration[ConnectionName + ":ConnectionString"];
                     var databaseName = Configuration[ConnectionName + ":DatabaseName"];
@@ -34,8 +34,20 @@ namespace CoreCommon.Data.MongoDBBase.Base
                     }
 
                     var client = new MongoClient(connectionString);
-                    var database = client.GetDatabase(databaseName);
-                    _collection = database.GetCollection<TDocument>(CollectionName);
+                    _database = client.GetDatabase(databaseName);
+                }
+                return _database;
+            }
+        }
+
+        IMongoCollection<TDocument> _collection;
+        protected IMongoCollection<TDocument> Collection
+        {
+            get
+            {
+                if (_collection == null)
+                {
+                    _collection = Database.GetCollection<TDocument>(CollectionName);
                 }
                 return _collection;
             }
@@ -156,9 +168,22 @@ namespace CoreCommon.Data.MongoDBBase.Base
             return (int)(res.ModifiedCount + res.InsertedCount);
         }
 
-        public IEnumerable<TDocument> FindAndIncludeBy<TProp>(Expression<Func<TDocument, bool>> predicate, params Expression<Func<TDocument, TProp>>[] include)
+        public IEnumerable<TDocument> FindAndIncludeBy<TForeignDocument>(Expression<Func<TDocument, bool>> predicate,
+                                                                                    Expression<Func<TDocument, object>> localField,
+                                                                                    Expression<Func<TForeignDocument, object>> foreignField,
+                                                                                    Expression<Func<TDocument, object>> bindField
+                                                                                    )
         {
-            throw new NotImplementedException();
+            var res = Collection.Aggregate();
+            var name = typeof(TForeignDocument).Name.Replace("Entity", "");
+            res = res.Lookup<TDocument, TForeignDocument, TDocument>(
+                        Database.GetCollection<TForeignDocument>(name),
+                        localField,
+                        foreignField,
+                        bindField
+                    ).Unwind(bindField).As<TDocument>();
+
+            return res.Match(predicate).ToEnumerable();
         }
     }
 }
