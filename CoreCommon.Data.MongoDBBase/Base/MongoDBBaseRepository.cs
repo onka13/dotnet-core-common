@@ -13,57 +13,18 @@ namespace CoreCommon.Data.MongoDBBase.Base
     /// MongoDB base repository
     /// </summary>
     /// <typeparam name="TDocument"></typeparam>
-    public abstract class MongoDBBaseRepository<TDocument>
+    public abstract class MongoDBBaseRepository<TDocument, TDbContext>
         : RepositoryBase<TDocument>, IMongoDBBaseRepository<TDocument>
-        where TDocument : class, IMongoDBBaseEntity<TDocument>
+        where TDocument : class, IMongoDBBaseEntity<TDocument> where TDbContext : MongoDbContextBase
     {
-        IMongoDatabase _database;
-        protected IMongoDatabase Database
-        {
-            get
-            {
-                if (_database == null)
-                {
-                    var connectionString = Configuration[ConnectionName + ":ConnectionString"];
-                    var databaseName = Configuration[ConnectionName + ":DatabaseName"];
+        public TDbContext DbContext { get; set; }
 
-                    if (!string.IsNullOrEmpty(Configuration[ConnectionName + "_ConnectionString"]))
-                    {
-                        connectionString = Configuration[ConnectionName + "_ConnectionString"];
-                        databaseName = Configuration[ConnectionName + "_DatabaseName"];
-                    }
-
-                    var client = new MongoClient(connectionString);
-                    _database = client.GetDatabase(databaseName);
-                }
-                return _database;
-            }
-        }
-
-        IMongoCollection<TDocument> _collection;
         protected IMongoCollection<TDocument> Collection
         {
             get
             {
-                if (_collection == null)
-                {
-                    _collection = Database.GetCollection<TDocument>(CollectionName);
-                }
-                return _collection;
+                return DbContext.GetCollection<TDocument>();
             }
-        }
-        public string CollectionName { get; }
-
-        /// <summary>
-        /// Name of the context
-        /// </summary>
-        public abstract string ConnectionName { get; }
-        public IConfiguration Configuration { get; set; }
-
-        public MongoDBBaseRepository()
-        {
-            var collectionAttribute = (CollectionAttribute)typeof(TDocument).GetCustomAttributes(typeof(CollectionAttribute), false).FirstOrDefault();
-            CollectionName = collectionAttribute.Name;
         }
 
         public IQueryable<TDocument> GetQueryable()
@@ -76,11 +37,6 @@ namespace CoreCommon.Data.MongoDBBase.Base
             return Collection.Find(x => true).ToList();
         }
 
-        public TDocument Get(Expression<Func<TDocument, bool>> filter)
-        {
-            return Collection.Find(filter).FirstOrDefault();
-        }
-
         public TDocument Add(TDocument entity)
         {
             Collection.InsertOne(entity);
@@ -89,12 +45,38 @@ namespace CoreCommon.Data.MongoDBBase.Base
 
         public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate)
         {
-            return Collection.Find(predicate).ToList();
+            return FindBy(predicate, false);
+        }
+
+        public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate, bool includeRelations)
+        {
+            if (!includeRelations)
+                return Collection.Find(predicate).ToList();
+            return GetRelationAggregate().Match(predicate).ToList();
+        }
+
+        public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate, int skip, int take)
+        {
+            return FindBy(predicate, skip, take, false);
+        }
+
+        public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate, int skip, int take, bool includeRelations)
+        {
+            if (!includeRelations)
+                return Collection.Find(predicate).Skip(skip).Limit(take).ToEnumerable();
+            return GetRelationAggregate().Match(predicate).Skip(skip).Limit(take).ToEnumerable();
         }
 
         public TDocument GetBy(Expression<Func<TDocument, bool>> predicate)
         {
-            return Collection.Find(predicate).FirstOrDefault();
+            return GetBy(predicate, false);
+        }
+
+        public TDocument GetBy(Expression<Func<TDocument, bool>> predicate, bool includeRelations)
+        {
+            if (!includeRelations)
+                return Collection.Find(predicate).FirstOrDefault();
+            return GetRelationAggregate().Match(predicate).FirstOrDefault();
         }
 
         public int Delete(TDocument entity)
@@ -168,6 +150,11 @@ namespace CoreCommon.Data.MongoDBBase.Base
             return (int)(res.ModifiedCount + res.InsertedCount);
         }
 
+        public virtual IAggregateFluent<TDocument> GetRelationAggregate()
+        {
+            return Collection.Aggregate();
+        }
+
         public IEnumerable<TDocument> FindAndIncludeBy<TForeignDocument>(Expression<Func<TDocument, bool>> predicate,
                                                                                     Expression<Func<TDocument, object>> localField,
                                                                                     Expression<Func<TForeignDocument, object>> foreignField,
@@ -175,15 +162,30 @@ namespace CoreCommon.Data.MongoDBBase.Base
                                                                                     )
         {
             var res = Collection.Aggregate();
-            var name = typeof(TForeignDocument).Name.Replace("Entity", "");
             res = res.Lookup<TDocument, TForeignDocument, TDocument>(
-                        Database.GetCollection<TForeignDocument>(name),
+                        DbContext.GetCollection<TForeignDocument>(),
                         localField,
                         foreignField,
                         bindField
                     ).Unwind(bindField).As<TDocument>();
 
             return res.Match(predicate).ToEnumerable();
+        }
+
+        public List<object> SkipTake<T>(IAggregateFluent<T> result, int skip, int take, out long total)
+        {
+            if (take > 0)
+            {
+                total = result.Count().FirstOrDefault().Count;
+                result = result.Skip(skip).Limit(take);
+            }
+            else
+            {
+                total = 0;
+            }
+            var list = result.ToList();
+
+            return list.Cast<object>().ToList();
         }
     }
 }

@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace CoreCommon.Data.Domain.Business
 {
     public class RepositoryBase<TEntity>
     {
-        public List<object> SkipTake(IEnumerable<object> result, int skip, int take, out long total)
+        public virtual List<object> SkipTake(IEnumerable<object> result, int skip, int take, out long total)
         {
             if (take > 0)
             {
@@ -17,6 +19,24 @@ namespace CoreCommon.Data.Domain.Business
                 total = 0;
             }
             return result.Select(x => (object)x).ToList();
+        }
+
+        public Expression<Func<TEntity, T>> Projection<T>(Expression<Func<TEntity, T>> projection)
+        {
+            return projection;
+        }
+
+        public Expression<Func<TEntity, object>> SortField(string orderBy, params Expression<Func<TEntity, object>>[] fields)
+        {
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                foreach (var field in fields)
+                {
+                    var name = (field.Body as MemberExpression).Member.Name;
+                    if (name.Equals(orderBy, StringComparison.InvariantCultureIgnoreCase)) return field;
+                }
+            }
+            return null;
         }
     }
 }

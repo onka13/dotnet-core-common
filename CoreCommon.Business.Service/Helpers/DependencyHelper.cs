@@ -47,7 +47,13 @@ namespace CoreCommon.Business.Service.Helpers
                     .Where(t => t.Name.EndsWith("DbContext"))
                     .AsSelf()
                     .PropertiesAutowired()
-                    .InstancePerDependency();
+                    .InstancePerDependency(); 
+                
+                builder.RegisterAssemblyTypes(assembly)
+                    .Where(t => t.Name.EndsWith("MongoContext"))
+                    .AsSelf()
+                    .PropertiesAutowired()
+                    .SingleInstance();
             }
         }
     }
