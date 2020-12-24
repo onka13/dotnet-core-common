@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace CoreCommon.Data.MongoDBBase.Base
-{
+{    
     public abstract class MongoDbContextBase
     {
         /// <summary>
@@ -26,7 +24,14 @@ namespace CoreCommon.Data.MongoDBBase.Base
             get
             {
                 if (_database == null)
-                {
+                {                    
+                    // https://mongodb.github.io/mongo-csharp-driver/2.3/apidocs/html/N_MongoDB_Bson_Serialization_Conventions.htm
+                    var conventionPack = new ConventionPack {
+                        new IgnoreExtraElementsConvention(true),
+                    };
+                    ConventionRegistry.Register("pack", conventionPack, type => true);
+                    //BsonSerializer.RegisterSerializer(new MySerializer());
+
                     var databaseName = Configuration[Name + ":DatabaseName"];
 
                     if (!string.IsNullOrEmpty(Configuration[Name + "_ConnectionString"]))
@@ -62,7 +67,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
         public IMongoCollection<T> GetCollection<T>()
         {
             var name = "";
-            
+
             var collectionAttribute = (CollectionAttribute)typeof(T).GetCustomAttributes(typeof(CollectionAttribute), false).FirstOrDefault();
             if (collectionAttribute != null) name = collectionAttribute.Name;
             else name = Regex.Replace(nameof(T), @"Entity$", "");

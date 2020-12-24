@@ -93,7 +93,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
         public int Edit(TDocument entity)
         {
             var result = Collection.ReplaceOne(entity.PrimaryPredicate(), entity);
-            return result.IsAcknowledged ? (int)result.ModifiedCount : 0;
+            return result.IsAcknowledged ? (int)result.MatchedCount : 0;
         }
 
         public int EditOnly(TDocument entity, params Expression<Func<TDocument, object>>[] properties)
@@ -176,7 +176,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
         {
             if (take > 0)
             {
-                total = result.Count().FirstOrDefault().Count;
+                total = result.Count().FirstOrDefault()?.Count ?? 0;
                 result = result.Skip(skip).Limit(take);
             }
             else
@@ -186,6 +186,14 @@ namespace CoreCommon.Data.MongoDBBase.Base
             var list = result.ToList();
 
             return list.Cast<object>().ToList();
+        }
+
+        protected AggregateUnwindOptions<T> GetAggregateUnwindOptions<T>()
+        {
+            return new AggregateUnwindOptions<T>()
+            {
+                PreserveNullAndEmptyArrays = true
+            };
         }
     }
 }
