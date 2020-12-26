@@ -1,11 +1,16 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using CoreCommon.Infra.Helpers;
+using CoreCommon.Data.MongoDBBase.Serializers;
 
 namespace CoreCommon.Data.MongoDBBase.Base
-{    
+{
     public abstract class MongoDbContextBase
     {
         /// <summary>
@@ -24,14 +29,15 @@ namespace CoreCommon.Data.MongoDBBase.Base
             get
             {
                 if (_database == null)
-                {                    
+                {
+                    BsonSerializer.RegisterSerializer(new MyObjectSerializer());
+
                     // https://mongodb.github.io/mongo-csharp-driver/2.3/apidocs/html/N_MongoDB_Bson_Serialization_Conventions.htm
                     var conventionPack = new ConventionPack {
                         new IgnoreExtraElementsConvention(true),
                     };
                     ConventionRegistry.Register("pack", conventionPack, type => true);
-                    //BsonSerializer.RegisterSerializer(new MySerializer());
-
+                   
                     var databaseName = Configuration[Name + ":DatabaseName"];
 
                     if (!string.IsNullOrEmpty(Configuration[Name + "_ConnectionString"]))

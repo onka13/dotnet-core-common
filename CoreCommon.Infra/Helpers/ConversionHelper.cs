@@ -42,10 +42,10 @@ namespace CoreCommon.Infra.Helpers
         /// <param name="culture"></param>
         /// <param name="isCamelCase"></param>
         /// <returns></returns>
-        public static string Serialize(object obj, CultureInfo culture = null, bool isCamelCase = false)
+        public static string Serialize(object obj, CultureInfo culture = null, bool isCamelCase = false, bool isIndented = false)
         {
             var writer = new StringWriter();
-            JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings { Culture = culture, Formatting = Formatting.Indented });
+            JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings { Culture = culture, Formatting = isIndented ? Formatting.Indented : Formatting.None });
             if (isCamelCase)
             {
                 serializer.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -73,6 +73,16 @@ namespace CoreCommon.Infra.Helpers
             serializer.Converters.Add(new DateTimeConverter());
             serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             return serializer.Deserialize<T>(reader);
+        }
+
+        public static string SerializeObject(object obj, bool isIndented = false)
+        {
+            return JsonConvert.SerializeObject(obj, isIndented ? Formatting.Indented : Formatting.None);
+        }
+        
+        public static object DerializeObject<T>(string value)
+        {
+            return JsonConvert.DeserializeObject<T>(value);
         }
 
         /// <summary>

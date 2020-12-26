@@ -1,4 +1,5 @@
 ﻿using CoreCommon.Data.Domain.Business;
+using CoreCommon.Data.Domain.Models;
 using CoreCommon.ModuleBase.Filters;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CoreCommon.ModuleBase.Components
@@ -76,6 +78,30 @@ namespace CoreCommon.ModuleBase.Components
                     response.Value.Add(item.Key);
             }
             return Json(response);
+        }
+
+        protected FormFile ToFormFile(IFormFile file)
+        {
+            if (file == null) return null;
+            var model = new FormFile
+            {
+                Extension = Path.GetExtension(file.FileName).Replace(".", ""),
+                Name = file.FileName,
+                ContentType = file.ContentType,
+                Stream = file.OpenReadStream()
+            };
+            if (file.ContentType.Contains("image"))
+                model.FileType = FileType.Image;
+            else if (file.ContentType.Contains("json"))
+                model.FileType = FileType.Json;
+            else if (file.ContentType.Contains("audio"))
+                model.FileType = FileType.Audio;
+            else if (file.ContentType.Contains("video"))
+                model.FileType = FileType.Video;
+            else
+                model.FileType = FileType.Other;
+
+            return model;
         }
     }
 }
