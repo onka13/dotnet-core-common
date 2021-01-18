@@ -6,6 +6,8 @@ using System.Linq.Expressions;
 using MongoDB.Driver;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
 
 namespace CoreCommon.Data.MongoDBBase.Base
 {
@@ -110,7 +112,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
                 def = def.Set(properties[i], properties[i].Compile().Invoke(entity));
             }
             var result = Collection.UpdateOne(entity.PrimaryPredicate(), def);
-            return result.IsAcknowledged ? (int)result.ModifiedCount : 0;
+            return result.IsAcknowledged ? (int)result.MatchedCount : 0;
         }
 
         public int BulkInsert(List<TDocument> entities)
@@ -170,6 +172,21 @@ namespace CoreCommon.Data.MongoDBBase.Base
                     ).Unwind(bindField).As<TDocument>();
 
             return res.Match(predicate).ToEnumerable();
+        }
+
+        public List<dynamic> RawJsonQuery<T>(string json)
+        {
+            //var query = BsonSerializer.Deserialize<List<BsonDocument>>(json);
+            //var res = Collection.Aggregate<BsonDocument>(query).ToList();
+            var doc = BsonDocument.Parse(json.Trim());
+            PipelineDefinition<T, dynamic> pipeline = new BsonDocument[]
+            {
+                doc
+            };
+
+            var res0 = DbContext.GetCollection<T>().Aggregate(pipeline).ToList();
+
+            return res0;
         }
 
         public List<object> SkipTake<T>(IAggregateFluent<T> result, int skip, int take, out long total)

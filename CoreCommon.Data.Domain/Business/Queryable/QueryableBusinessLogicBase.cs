@@ -22,6 +22,17 @@ namespace CoreCommon.Data.Domain.Business
             }
             return response;
         }
+        
+        public ServiceResult<IEnumerable<TEntity>> FindBy(Expression<Func<TEntity, bool>> predicate, int skip, int take, bool includeRelations = false)
+        {
+            var response = ServiceResult<IEnumerable<TEntity>>.Instance.ErrorResult(ServiceResultCode.Error);
+            var form = Repository.FindBy(predicate, skip, take, includeRelations);
+            if (form != null)
+            {
+                response.SuccessResult(form);
+            }
+            return response;
+        }
 
         public ServiceResult<TEntity> GetBy(Expression<Func<TEntity, bool>> predicate, bool includeRelations = false)
         {

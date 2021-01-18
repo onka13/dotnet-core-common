@@ -18,7 +18,7 @@ namespace CoreCommon.AmazonBusiness.helpers
         public AmazonS3Manager(AmazonConfig config)
         {
             Config = config;
-            var region = RegionEndpoint.EnumerableAllRegions.FirstOrDefault(x => x.SystemName == config.Region);
+            var region = RegionEndpoint.GetBySystemName(config.Region);
 
             s3Client = new AmazonS3Client(Config.AccessKey, Config.SecretKey, new AmazonS3Config()
             {

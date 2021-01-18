@@ -11,6 +11,6 @@ namespace CoreCommon.Data.MongoDBBase.Base
                                                                                     Expression<Func<TDocument, object>> localField,
                                                                                     Expression<Func<TForeignDocument, object>> foreignField,
                                                                                     Expression<Func<TDocument, object>> bindField);
-        
+        List<dynamic> RawJsonQuery<T>(string json);
     }
 }

@@ -93,5 +93,45 @@ namespace CoreCommon.ImageBusiness.Helpers
                 image.Save(path, encoder);
             }
         }
+
+        public static MemoryStream CropImage(Stream stream, int x, int y, int w, int h, string extension = "jpg")
+        {
+            using (var image = Image.Load(stream))
+            {
+                return CropImage(image, x, y, w, h, extension);
+            }
+        }
+        
+        public static MemoryStream CropImage(string url, int x, int y, int w, int h, string extension = "jpg")
+        {
+            using (var image = Image.Load(url))
+            {
+                return CropImage(image, x, y, w, h, extension);
+            }
+        }
+
+        public static MemoryStream CropImage(Image image, int x, int y, int w, int h, string extension = "jpg")
+        {
+            image.Mutate(o => o
+                    .Crop(new Rectangle(x, y, w, h))
+                 );
+            var memoryStream = new MemoryStream();
+            IImageEncoder encoder;
+            if (extension == "jpg" || extension == ".jpg")
+            {
+                encoder = new JpegEncoder
+                {
+                    Quality = 75
+                };
+            }
+            else
+            {
+                encoder = new PngEncoder();
+            }
+
+            image.Save(memoryStream, encoder);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return memoryStream;
+        }
     }
 }

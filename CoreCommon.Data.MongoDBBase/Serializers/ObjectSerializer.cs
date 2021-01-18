@@ -19,14 +19,21 @@ namespace CoreCommon.Data.MongoDBBase.Serializers
             //var result = BsonExtensionMethods.ToJson(bsonDocument);
             //return JsonConvert.DeserializeObject<IDictionary<string, object>>(result);
 
-            return ConversionHelper.DerializeObject<object>(document.ToJson());
+            try
+            {
+                return ConversionHelper.DerializeObject<object>(document.ToJson());
+            }
+            catch (Exception)
+            {
+                return document;
+            }
         }
 
         public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
         {
             var serializer = BsonSerializer.LookupSerializer(typeof(BsonDocument));
 
-            var actualType = value.GetType();
+            var actualType = value?.GetType();
 
             if(actualType == typeof(BsonDocument))
             {

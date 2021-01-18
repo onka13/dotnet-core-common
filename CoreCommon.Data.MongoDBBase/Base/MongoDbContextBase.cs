@@ -24,19 +24,26 @@ namespace CoreCommon.Data.MongoDBBase.Base
         public IConfiguration Configuration { get; set; }
 
         IMongoDatabase _database;
-        protected IMongoDatabase Database
+        public IMongoDatabase Database
         {
             get
             {
                 if (_database == null)
                 {
-                    BsonSerializer.RegisterSerializer(new MyObjectSerializer());
+                    try
+                    {
+                        BsonSerializer.RegisterSerializer(new MyObjectSerializer());
 
-                    // https://mongodb.github.io/mongo-csharp-driver/2.3/apidocs/html/N_MongoDB_Bson_Serialization_Conventions.htm
-                    var conventionPack = new ConventionPack {
+                        // https://mongodb.github.io/mongo-csharp-driver/2.3/apidocs/html/N_MongoDB_Bson_Serialization_Conventions.htm
+                        var conventionPack = new ConventionPack {
                         new IgnoreExtraElementsConvention(true),
                     };
-                    ConventionRegistry.Register("pack", conventionPack, type => true);
+                        ConventionRegistry.Register("pack", conventionPack, type => true);
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
                    
                     var databaseName = Configuration[Name + ":DatabaseName"];
 
@@ -70,7 +77,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
             }
         }
 
-        public IMongoCollection<T> GetCollection<T>()
+        public string GetCollectionName<T>()
         {
             var name = "";
 
@@ -78,8 +85,12 @@ namespace CoreCommon.Data.MongoDBBase.Base
             if (collectionAttribute != null) name = collectionAttribute.Name;
             else name = Regex.Replace(nameof(T), @"Entity$", "");
 
-            return Database.GetCollection<T>(name);
+            return name;
         }
-
+        
+        public IMongoCollection<T> GetCollection<T>()
+        {
+            return Database.GetCollection<T>(GetCollectionName<T>());
+        }
     }
 }

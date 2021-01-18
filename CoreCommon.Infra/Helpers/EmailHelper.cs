@@ -1,6 +1,10 @@
 ﻿using CoreCommon.Data.Domain.Config;
 using MailKit.Net.Smtp;
 using MimeKit;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 
 namespace CoreCommon.Infra.Helpers
@@ -16,6 +20,18 @@ namespace CoreCommon.Infra.Helpers
         {
             Name = name;
             Email = email;
+        }
+    }
+
+    public class MailAttachment
+    {
+        public string FileName { get; set; }
+        public Stream Stream { get; set; }
+
+        public MailAttachment(string fileName, Stream stream)
+        {
+            FileName = fileName;
+            Stream = stream;
         }
     }
 
@@ -35,7 +51,7 @@ namespace CoreCommon.Infra.Helpers
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public static async Task SendEmail(SmtpConfig config, string subject, string body, MailAddress from, params MailAddress[] to)
+        public static async Task SendEmail(SmtpConfig config, string subject, string body, MailAddress from, List<MailAttachment> attachments, params MailAddress[] to)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(from.Name, from.Email));
@@ -50,16 +66,23 @@ namespace CoreCommon.Infra.Helpers
                 HtmlBody = body
             };
 
-            message.Body = bodyBuilder.ToMessageBody(); 
-            /*new TextPart("plain")
+            if (attachments != null)
             {
-                Text = body
-            };*/
+                foreach (var attach in attachments)
+                {
+                    bodyBuilder.Attachments.Add(attach.FileName, attach.Stream);
+                }
+            }
+
+            message.Body = bodyBuilder.ToMessageBody();
 
             using (var client = new SmtpClient())
             {
+                //System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                client.CheckCertificateRevocation = false;
 
+                client.SslProtocols = SslProtocols.Ssl3 | SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
                 await client.ConnectAsync(config.Server, config.Port, config.UseSsl);
                 await client.AuthenticateAsync(config.User, config.Pass);
                 await client.SendAsync(message);
