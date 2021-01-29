@@ -32,7 +32,24 @@ namespace CoreCommon.Data.Domain.Business
             {
                 foreach (var field in fields)
                 {
-                    var name = (field.Body as MemberExpression).Member.Name;
+                    string name;
+                    if (field.Body is MemberExpression)
+                    {
+                        name = (field.Body as MemberExpression).Member.Name;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            name = (field.Body as dynamic).Operand.Member.Name;
+                        }
+                        catch (Exception)
+                        {
+                            continue;
+                        }
+                    }
+                    
+                    
                     if (name.Equals(orderBy, StringComparison.InvariantCultureIgnoreCase)) return field;
                 }
             }
