@@ -61,8 +61,26 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
 
         public IEnumerable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate)
         {
-            IEnumerable<TEntity> query = GetDbSet().Where(predicate).AsEnumerable();
-            return query;
+            return FindBy(predicate, false);
+        }
+
+        public IEnumerable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate, bool includeRelations)
+        {
+            if (!includeRelations)
+                return GetDbSet().Where(predicate).AsEnumerable();
+            return GetRelationQueryable().Where(predicate).AsEnumerable();
+        }
+
+        public IEnumerable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate, int skip, int take)
+        {
+            return FindBy(predicate, skip, take, false);
+        }
+
+        public IEnumerable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate, int skip, int take, bool includeRelations)
+        {
+            if (!includeRelations)
+                return GetDbSet().Where(predicate).Skip(skip).Take(take).AsEnumerable();
+            return GetRelationQueryable().Where(predicate).Skip(skip).Take(take).AsEnumerable();
         }
 
         public IEnumerable<TEntity> FindAndIncludeBy<TProp>(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, TProp>>[] include)
@@ -84,7 +102,14 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
 
         public TEntity GetBy(Expression<Func<TEntity, bool>> predicate)
         {
-            return GetDbSet().FirstOrDefault(predicate);
+            return GetBy(predicate, false);
+        }
+
+        public TEntity GetBy(Expression<Func<TEntity, bool>> predicate, bool includeRelations)
+        {
+            if (!includeRelations)
+                return GetDbSet().FirstOrDefault(predicate);
+            return GetRelationQueryable().FirstOrDefault(predicate);
         }
 
         public virtual TEntity Add(TEntity entity)
@@ -303,6 +328,11 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
         public IQueryable<TEntity> GetQueryable()
         {
             return GetDbSet().AsQueryable();
+        }
+
+        public virtual IQueryable<TEntity> GetRelationQueryable()
+        {
+            return GetDbSet();
         }
     }
 }

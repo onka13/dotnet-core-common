@@ -6,6 +6,8 @@ using System.Linq.Expressions;
 using MongoDB.Driver;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
 
 namespace CoreCommon.Data.MongoDBBase.Base
 {
@@ -13,45 +15,18 @@ namespace CoreCommon.Data.MongoDBBase.Base
     /// MongoDB base repository
     /// </summary>
     /// <typeparam name="TDocument"></typeparam>
-    public abstract class MongoDBBaseRepository<TDocument>
+    public abstract class MongoDBBaseRepository<TDocument, TDbContext>
         : RepositoryBase<TDocument>, IMongoDBBaseRepository<TDocument>
-        where TDocument : class, IMongoDBBaseEntity<TDocument>
+        where TDocument : class, IMongoDBBaseEntity<TDocument> where TDbContext : MongoDbContextBase
     {
-        IMongoCollection<TDocument> _collection;
-        IMongoCollection<TDocument> Collection
+        public TDbContext DbContext { get; set; }
+
+        protected IMongoCollection<TDocument> Collection
         {
             get
             {
-                if(_collection == null)
-                {
-                    var connectionString = Configuration[ConnectionName + ":ConnectionString"];
-                    var databaseName = Configuration[ConnectionName + ":DatabaseName"];
-
-                    if (!string.IsNullOrEmpty(Configuration[ConnectionName + "_ConnectionString"]))
-                    {
-                        connectionString = Configuration[ConnectionName + "_ConnectionString"];
-                        databaseName = Configuration[ConnectionName + "_DatabaseName"];
-                    }
-
-                    var client = new MongoClient(connectionString);
-                    var database = client.GetDatabase(databaseName);
-                    _collection = database.GetCollection<TDocument>(CollectionName);
-                }
-                return _collection;
+                return DbContext.GetCollection<TDocument>();
             }
-        }
-        public string CollectionName { get; }
-
-        /// <summary>
-        /// Name of the context
-        /// </summary>
-        public abstract string ConnectionName { get; }
-        public IConfiguration Configuration { get; set; }
-
-        public MongoDBBaseRepository()
-        {
-            var collectionAttribute = (CollectionAttribute)typeof(TDocument).GetCustomAttributes(typeof(CollectionAttribute), false).FirstOrDefault();
-            CollectionName = collectionAttribute.Name;
         }
 
         public IQueryable<TDocument> GetQueryable()
@@ -64,11 +39,6 @@ namespace CoreCommon.Data.MongoDBBase.Base
             return Collection.Find(x => true).ToList();
         }
 
-        public TDocument Get(Expression<Func<TDocument, bool>> filter)
-        {
-            return Collection.Find(filter).FirstOrDefault();
-        }
-
         public TDocument Add(TDocument entity)
         {
             Collection.InsertOne(entity);
@@ -77,12 +47,38 @@ namespace CoreCommon.Data.MongoDBBase.Base
 
         public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate)
         {
-            return Collection.Find(predicate).ToList();
+            return FindBy(predicate, false);
+        }
+
+        public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate, bool includeRelations)
+        {
+            if (!includeRelations)
+                return Collection.Find(predicate).ToList();
+            return GetRelationAggregate().Match(predicate).ToList();
+        }
+
+        public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate, int skip, int take)
+        {
+            return FindBy(predicate, skip, take, false);
+        }
+
+        public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate, int skip, int take, bool includeRelations)
+        {
+            if (!includeRelations)
+                return Collection.Find(predicate).Skip(skip).Limit(take).ToEnumerable();
+            return GetRelationAggregate().Match(predicate).Skip(skip).Limit(take).ToEnumerable();
         }
 
         public TDocument GetBy(Expression<Func<TDocument, bool>> predicate)
         {
-            return Collection.Find(predicate).FirstOrDefault();
+            return GetBy(predicate, false);
+        }
+
+        public TDocument GetBy(Expression<Func<TDocument, bool>> predicate, bool includeRelations)
+        {
+            if (!includeRelations)
+                return Collection.Find(predicate).FirstOrDefault();
+            return GetRelationAggregate().Match(predicate).FirstOrDefault();
         }
 
         public int Delete(TDocument entity)
@@ -99,7 +95,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
         public int Edit(TDocument entity)
         {
             var result = Collection.ReplaceOne(entity.PrimaryPredicate(), entity);
-            return result.IsAcknowledged ? (int)result.ModifiedCount : 0;
+            return result.IsAcknowledged ? (int)result.MatchedCount : 0;
         }
 
         public int EditOnly(TDocument entity, params Expression<Func<TDocument, object>>[] properties)
@@ -116,7 +112,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
                 def = def.Set(properties[i], properties[i].Compile().Invoke(entity));
             }
             var result = Collection.UpdateOne(entity.PrimaryPredicate(), def);
-            return result.IsAcknowledged ? (int)result.ModifiedCount : 0;
+            return result.IsAcknowledged ? (int)result.MatchedCount : 0;
         }
 
         public int BulkInsert(List<TDocument> entities)
@@ -156,9 +152,65 @@ namespace CoreCommon.Data.MongoDBBase.Base
             return (int)(res.ModifiedCount + res.InsertedCount);
         }
 
-        public IEnumerable<TDocument> FindAndIncludeBy<TProp>(Expression<Func<TDocument, bool>> predicate, params Expression<Func<TDocument, TProp>>[] include)
+        public virtual IAggregateFluent<TDocument> GetRelationAggregate()
         {
-            throw new NotImplementedException();
+            return Collection.Aggregate();
+        }
+
+        public IEnumerable<TDocument> FindAndIncludeBy<TForeignDocument>(Expression<Func<TDocument, bool>> predicate,
+                                                                                    Expression<Func<TDocument, object>> localField,
+                                                                                    Expression<Func<TForeignDocument, object>> foreignField,
+                                                                                    Expression<Func<TDocument, object>> bindField
+                                                                                    )
+        {
+            var res = Collection.Aggregate();
+            res = res.Lookup<TDocument, TForeignDocument, TDocument>(
+                        DbContext.GetCollection<TForeignDocument>(),
+                        localField,
+                        foreignField,
+                        bindField
+                    ).Unwind(bindField).As<TDocument>();
+
+            return res.Match(predicate).ToEnumerable();
+        }
+
+        public List<dynamic> RawJsonQuery<T>(string json)
+        {
+            //var query = BsonSerializer.Deserialize<List<BsonDocument>>(json);
+            //var res = Collection.Aggregate<BsonDocument>(query).ToList();
+            var doc = BsonDocument.Parse(json.Trim());
+            PipelineDefinition<T, dynamic> pipeline = new BsonDocument[]
+            {
+                doc
+            };
+
+            var res0 = DbContext.GetCollection<T>().Aggregate(pipeline).ToList();
+
+            return res0;
+        }
+
+        public List<object> SkipTake<T>(IAggregateFluent<T> result, int skip, int take, out long total)
+        {
+            if (take > 0)
+            {
+                total = result.Count().FirstOrDefault()?.Count ?? 0;
+                result = result.Skip(skip).Limit(take);
+            }
+            else
+            {
+                total = 0;
+            }
+            var list = result.ToList();
+
+            return list.Cast<object>().ToList();
+        }
+
+        protected AggregateUnwindOptions<T> GetAggregateUnwindOptions<T>()
+        {
+            return new AggregateUnwindOptions<T>()
+            {
+                PreserveNullAndEmptyArrays = true
+            };
         }
     }
 }

@@ -12,10 +12,21 @@ namespace CoreCommon.Data.Domain.Business
     public abstract class QueryableBusinessLogicBase<TEntity, TRepository> : CrudBusinessLogicBase<TEntity, TRepository>, IQueryableBusinessLogicBase<TEntity> 
         where TRepository : IQueryableRepositoryBase<TEntity>
     {
-        public ServiceResult<IEnumerable<TEntity>> FindBy(Expression<Func<TEntity, bool>> predicate)
+        public ServiceResult<IEnumerable<TEntity>> FindBy(Expression<Func<TEntity, bool>> predicate, bool includeRelations = false)
         {
             var response = ServiceResult<IEnumerable<TEntity>>.Instance.ErrorResult(ServiceResultCode.Error);
-            var form = Repository.FindBy(predicate);
+            var form = Repository.FindBy(predicate, includeRelations);
+            if (form != null)
+            {
+                response.SuccessResult(form);
+            }
+            return response;
+        }
+        
+        public ServiceResult<IEnumerable<TEntity>> FindBy(Expression<Func<TEntity, bool>> predicate, int skip, int take, bool includeRelations = false)
+        {
+            var response = ServiceResult<IEnumerable<TEntity>>.Instance.ErrorResult(ServiceResultCode.Error);
+            var form = Repository.FindBy(predicate, skip, take, includeRelations);
             if (form != null)
             {
                 response.SuccessResult(form);
@@ -23,21 +34,10 @@ namespace CoreCommon.Data.Domain.Business
             return response;
         }
 
-        public ServiceResult<IEnumerable<TEntity>> FindAndIncludeBy<TProp>(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, TProp>>[] include)
-        {
-            var response = ServiceResult<IEnumerable<TEntity>>.Instance.ErrorResult(ServiceResultCode.Error);
-            var form = Repository.FindAndIncludeBy(predicate, include);
-            if (form != null)
-            {
-                response.SuccessResult(form);
-            }
-            return response;
-        }
-
-        public ServiceResult<TEntity> GetBy(Expression<Func<TEntity, bool>> predicate)
+        public ServiceResult<TEntity> GetBy(Expression<Func<TEntity, bool>> predicate, bool includeRelations = false)
         {
             var response = ServiceResult<TEntity>.Instance.ErrorResult(ServiceResultCode.Error);
-            var form = Repository.GetBy(predicate);
+            var form = Repository.GetBy(predicate, includeRelations);
             if (form != null)
             {
                 response.SuccessResult(form);
