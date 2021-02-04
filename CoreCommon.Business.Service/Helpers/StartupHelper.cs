@@ -20,7 +20,7 @@ namespace CoreCommon.Business.Service.Helpers
         /// <param name="startup">Startup class instance</param>
         /// <param name="isWeb">If environment is web patform</param>
         /// <returns></returns>
-        public static IHostBuilder CreateHostBuilder<TStartupBase>(string[] args, TStartupBase startup = null, bool isWeb = false) where TStartupBase : StartupBase
+        public static IHostBuilder CreateHostBuilder<TStartupBase>(string[] args, TStartupBase startup = null, bool isWeb = false, string environment = null) where TStartupBase : StartupBase
         {
             if (startup == null)
                 startup = Activator.CreateInstance<TStartupBase>();
@@ -36,7 +36,10 @@ namespace CoreCommon.Business.Service.Helpers
             {
                 host.ConfigureServices((hostContext, services) => startup.ConfigureServices(services));
             }
-
+            if(!string.IsNullOrEmpty(environment))
+            {
+                host = host.UseEnvironment(environment);
+            }
             return host;
         }
     }

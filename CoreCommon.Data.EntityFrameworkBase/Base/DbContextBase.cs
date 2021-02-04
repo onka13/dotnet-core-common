@@ -63,6 +63,9 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
 
             Provider = Provider?.ToLower() ?? "";
 
+            //System.Console.WriteLine("Provider " + Provider);
+            //System.Console.WriteLine("ConnectionString " + ConnectionString);
+
             if (Provider.Contains("mysql"))
             {
                 if (_connection != null)
