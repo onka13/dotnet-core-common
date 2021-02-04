@@ -266,5 +266,15 @@ namespace CoreCommon.Infra.Helpers
             var hash = sha.ComputeHash(Encoding.Unicode.GetBytes(text));
             return Encoding.Unicode.GetString(hash);
         }
+
+        public static string HashHmac(string secret, string message)
+        {
+            Encoding encoding = Encoding.UTF8;
+            using (var hmac = new HMACSHA256(encoding.GetBytes(secret)))
+            {
+                var hash = hmac.ComputeHash(encoding.GetBytes(message));
+                return BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
+            }
+        }
     }
 }
