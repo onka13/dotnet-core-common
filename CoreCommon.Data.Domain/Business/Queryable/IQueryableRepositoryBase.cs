@@ -19,5 +19,6 @@ namespace CoreCommon.Data.Domain.Business
         TEntity GetBy(Expression<Func<TEntity, bool>> predicate, bool includeRelations);
         int DeleteBy(Expression<Func<TEntity, bool>> predicate);
         int EditOnly(TEntity entity, params Expression<Func<TEntity, object>>[] properties);
+        int EditExcept(TEntity entity, params Expression<Func<TEntity, object>>[] exclude);
     }
 }
