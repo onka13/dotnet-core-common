@@ -143,6 +143,24 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             return Save();
         }
 
+        public virtual int EditExcept(TEntity entity, params Expression<Func<TEntity, object>>[] exclude)
+        {
+            if (exclude == null || exclude.Length == 0)
+            {
+                return Edit(entity);
+            }
+            var entry = AttachOnly(entity, EntityState.Modified);
+            foreach (var property in entry.Properties)
+            {
+                property.IsModified = true;
+            }
+            foreach (var property in exclude)
+            {
+                entry.Property(property).IsModified = true;
+            }
+            return Save();
+        }
+
         public virtual int EditBy(TEntity entity, params string[] properties)
         {
             if (properties == null || properties.Length == 0)
@@ -154,6 +172,7 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             //disable detection of changes to improve performance
             //db.Configuration.AutoDetectChangesEnabled = false;
             var entry = AttachOnly(entity, EntityState.Modified);
+            
             foreach (var property in properties)
             {
                 entry.Property(property).IsModified = true;
