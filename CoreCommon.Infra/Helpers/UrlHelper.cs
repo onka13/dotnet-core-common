@@ -73,5 +73,15 @@ namespace CoreCommon.Infra.Helpers
 
             return result;
         }
+    
+        public static string GetNiceFileName(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return text;
+            foreach (char invalidchar in System.IO.Path.GetInvalidFileNameChars())
+            {
+                text = text.Replace(invalidchar, '_');
+            }
+            return text;
+        }
     }
 }

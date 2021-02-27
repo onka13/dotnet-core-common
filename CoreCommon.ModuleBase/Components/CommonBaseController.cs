@@ -40,9 +40,9 @@ namespace CoreCommon.ModuleBase.Components
             return null;
         }
 
-        protected IActionResult SuccessResponse(object msg = null)
+        protected IActionResult SuccessResponse(object msg = null, int resultCode = 0)
         {
-            var response = ServiceResult<object>.Instance.SuccessResult(msg);
+            var response = ServiceResult<object>.Instance.SuccessResult(msg, resultCode);
             return Json(response);
         }
 

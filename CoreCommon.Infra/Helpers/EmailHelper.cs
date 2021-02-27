@@ -1,10 +1,13 @@
 ﻿using CoreCommon.Data.Domain.Config;
 using MailKit.Net.Smtp;
 using MimeKit;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Security.Authentication;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CoreCommon.Infra.Helpers
@@ -27,11 +30,18 @@ namespace CoreCommon.Infra.Helpers
     {
         public string FileName { get; set; }
         public Stream Stream { get; set; }
+        public byte[] Data { get; set; }
 
         public MailAttachment(string fileName, Stream stream)
         {
             FileName = fileName;
             Stream = stream;
+        }
+
+        public MailAttachment(string fileName, byte[] byteData)
+        {
+            FileName = fileName;
+            Data = byteData;
         }
     }
 
@@ -40,6 +50,50 @@ namespace CoreCommon.Infra.Helpers
     /// </summary>
     public class EmailHelper
     {
+        public static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            try
+            {
+                // Normalize the domain
+                email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
+                                      RegexOptions.None, TimeSpan.FromMilliseconds(200));
+
+                // Examines the domain part of the email and normalizes it.
+                string DomainMapper(Match match)
+                {
+                    // Use IdnMapping class to convert Unicode domain names.
+                    var idn = new IdnMapping();
+
+                    // Pull out and process domain name (throws ArgumentException on invalid)
+                    string domainName = idn.GetAscii(match.Groups[2].Value);
+
+                    return match.Groups[1].Value + domainName;
+                }
+            }
+            catch (RegexMatchTimeoutException e)
+            {
+                return false;
+            }
+            catch (ArgumentException e)
+            {
+                return false;
+            }
+
+            try
+            {
+                return Regex.IsMatch(email,
+                    @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+                    RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Sends an email.
         /// If you want to send email with using gmail, please check the below url;
@@ -51,7 +105,7 @@ namespace CoreCommon.Infra.Helpers
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public static async Task SendEmail(SmtpConfig config, string subject, string body, MailAddress from, List<MailAttachment> attachments, params MailAddress[] to)
+        public static async Task SendEmail(SmtpConfig config, string subject, string body, MailAddress from, List<MailAttachment> attachments, List<MailAddress> cc, List<MailAddress> bcc, params MailAddress[] to)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(from.Name, from.Email));
@@ -59,6 +113,23 @@ namespace CoreCommon.Infra.Helpers
             {
                 message.To.Add(new MailboxAddress(address.Name, address.Email));
             }
+
+            if (cc != null)
+            {
+                foreach (var address in cc)
+                {
+                    message.Cc.Add(new MailboxAddress(address.Name, address.Email));
+                }
+            }
+
+            if (bcc != null)
+            {
+                foreach (var address in bcc)
+                {
+                    message.Bcc.Add(new MailboxAddress(address.Name, address.Email));
+                }
+            }
+
             message.Subject = subject;
 
             var bodyBuilder = new BodyBuilder
@@ -70,7 +141,10 @@ namespace CoreCommon.Infra.Helpers
             {
                 foreach (var attach in attachments)
                 {
-                    bodyBuilder.Attachments.Add(attach.FileName, attach.Stream);
+                    if (attach.Stream != null)
+                        bodyBuilder.Attachments.Add(attach.FileName, attach.Stream);
+                    else
+                        bodyBuilder.Attachments.Add(attach.FileName, attach.Data);
                 }
             }
 
