@@ -44,6 +44,7 @@ namespace CoreCommon.Business.Service.Base
             config.SetBasePath(AppContext.BaseDirectory); // TODO: check Directory.GetCurrentDirectory()
             config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+            config.AddJsonFile($"appsettings.overrides.json", optional: true);
             config.AddEnvironmentVariables();
         }
 
