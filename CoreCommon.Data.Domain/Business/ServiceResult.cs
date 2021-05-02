@@ -105,6 +105,8 @@ namespace CoreCommon.Data.Domain.Business
         /// </summary>
         public T Value { get; set; }
 
+        public string Debug { get; set; }
+
         /// <summary>
         /// Creates an instance
         /// </summary>
