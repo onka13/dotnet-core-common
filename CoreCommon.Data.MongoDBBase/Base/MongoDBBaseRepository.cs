@@ -138,7 +138,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
 
         public int BulkUpdateOnly(List<TDocument> entities, params Expression<Func<TDocument, object>>[] properties)
         {
-            if (properties.Length == 0) return 0;
+            if (properties.Length == 0 || entities.Count == 0) return 0;
 
             var res = Collection.BulkWrite(entities.Select(entity =>
             {
@@ -193,6 +193,10 @@ namespace CoreCommon.Data.MongoDBBase.Base
         {
             if (take > 0)
             {
+                //var sortStage = result.Stages.FirstOrDefault(x => x.OperatorName == "$sort");
+                //var stages = result.Stages.Where(x => x.OperatorName != "$sort");                
+                //var resultForTotal = new PipelineStagePipelineDefinition<TDocument, T>(stages);
+                
                 total = result.Count().FirstOrDefault()?.Count ?? 0;
                 result = result.Skip(skip).Limit(take);
             }
