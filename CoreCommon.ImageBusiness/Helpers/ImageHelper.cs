@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using Drawing = System.Drawing;
+using System.IO;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
+using System.Threading.Tasks;
 
 namespace CoreCommon.ImageBusiness.Helpers
 {
@@ -11,6 +13,7 @@ namespace CoreCommon.ImageBusiness.Helpers
     {
         public static MemoryStream ResizeImage(Stream stream, int targetWidth, int targetHeight, bool isThumb = false, string extension = "jpg")
         {
+            stream.Seek(0, SeekOrigin.Begin);
             using (var image = Image.Load(stream))
             {
                 int destWidth = image.Width, destHeight = image.Height;
@@ -101,7 +104,7 @@ namespace CoreCommon.ImageBusiness.Helpers
                 return CropImage(image, x, y, w, h, extension);
             }
         }
-        
+
         public static MemoryStream CropImage(string url, int x, int y, int w, int h, string extension = "jpg")
         {
             using (var image = Image.Load(url))
@@ -132,6 +135,31 @@ namespace CoreCommon.ImageBusiness.Helpers
             image.Save(memoryStream, encoder);
             memoryStream.Seek(0, SeekOrigin.Begin);
             return memoryStream;
+        }
+
+        public static MemoryStream WatermarkImage(Stream stream, Stream watermarkStream)
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+
+            using (var image = Drawing.Image.FromStream(stream))
+            using (var watermarkImage = Drawing.Image.FromStream(watermarkStream))
+            using (var imageGraphics = Drawing.Graphics.FromImage(image))
+            {
+                int x = (image.Width - watermarkImage.Width) / 2;
+                int y = (image.Height - watermarkImage.Height) / 2;
+
+                imageGraphics.DrawImage(watermarkImage, x, y, watermarkImage.Width, watermarkImage.Height);
+
+                var finalStream = new MemoryStream();
+                image.Save(finalStream, Drawing.Imaging.ImageFormat.Png);
+                return finalStream;
+            }
+        }
+
+        public static async Task<Stream> GetStreamAsync(string url)
+        {
+            var client = new System.Net.Http.HttpClient();
+            return await client.GetStreamAsync(url);
         }
     }
 }
