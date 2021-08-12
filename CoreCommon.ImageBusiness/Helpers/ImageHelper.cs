@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
 using System.Threading.Tasks;
+using CoreCommon.ImageBusiness.Models;
 
 namespace CoreCommon.ImageBusiness.Helpers
 {
@@ -97,8 +98,22 @@ namespace CoreCommon.ImageBusiness.Helpers
             }
         }
 
+        public static ImageInfo GetImageDimensions(Stream stream)
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            using (var image = Image.Load(stream))
+            {
+                return new ImageInfo
+                {
+                    Width = image.Width,
+                    Height = image.Height
+                };
+            }
+        }
+        
         public static MemoryStream CropImage(Stream stream, int x, int y, int w, int h, string extension = "jpg")
         {
+            stream.Seek(0, SeekOrigin.Begin);
             using (var image = Image.Load(stream))
             {
                 return CropImage(image, x, y, w, h, extension);
@@ -137,21 +152,34 @@ namespace CoreCommon.ImageBusiness.Helpers
             return memoryStream;
         }
 
-        public static MemoryStream WatermarkImage(Stream stream, Stream watermarkStream)
+        public static MemoryStream WatermarkImage(Stream stream, Stream watermarkStream, string format = "jpg")
         {
-            stream.Seek(0, SeekOrigin.Begin);
-
-            using (var image = Drawing.Image.FromStream(stream))
+            try
+            {
+                if (stream.CanSeek)
+                    stream.Seek(0, SeekOrigin.Begin);
+                if (watermarkStream.CanSeek)
+                    watermarkStream.Seek(0, SeekOrigin.Begin);
+            }
+            catch (System.Exception ex)
+            {
+                var msg = ex.Message;
+            }
             using (var watermarkImage = Drawing.Image.FromStream(watermarkStream))
+            using (var image = Drawing.Image.FromStream(stream))
             using (var imageGraphics = Drawing.Graphics.FromImage(image))
             {
-                int x = (image.Width - watermarkImage.Width) / 2;
-                int y = (image.Height - watermarkImage.Height) / 2;
+                //int x = (image.Width - watermarkImage.Width) / 2;
+                //int y = (image.Height - watermarkImage.Height) / 2;
+                int x = (int)(image.Width * 0.3);
+                int y = (int)(image.Height * 0.3);
+                int w = (int)(image.Width * 0.4); //watermarkImage.Width
+                int h = (int)(image.Height * 0.4); //(int)(image.Width * 0.3)
 
-                imageGraphics.DrawImage(watermarkImage, x, y, watermarkImage.Width, watermarkImage.Height);
+                imageGraphics.DrawImage(watermarkImage, x, y, w, h);
 
                 var finalStream = new MemoryStream();
-                image.Save(finalStream, Drawing.Imaging.ImageFormat.Png);
+                image.Save(finalStream, format == "jpg" ? Drawing.Imaging.ImageFormat.Jpeg : Drawing.Imaging.ImageFormat.Png);
                 return finalStream;
             }
         }
@@ -159,7 +187,8 @@ namespace CoreCommon.ImageBusiness.Helpers
         public static async Task<Stream> GetStreamAsync(string url)
         {
             var client = new System.Net.Http.HttpClient();
-            return await client.GetStreamAsync(url);
+            var array = await client.GetByteArrayAsync(url);
+            return new MemoryStream(array);
         }
     }
 }

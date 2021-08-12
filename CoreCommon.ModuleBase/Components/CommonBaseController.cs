@@ -22,7 +22,9 @@ namespace CoreCommon.ModuleBase.Components
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            base.OnActionExecuting(context);
+            var stateFilter = new ModelStateFilter();
+            stateFilter.OnActionExecuting(context);
+            //base.OnActionExecuting(context);
         }
 
         protected string GetIpAddress()
