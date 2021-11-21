@@ -52,7 +52,10 @@ namespace CoreCommon.ModuleBase.Filters
                         if (err.Exception != null) msg += "exception: " + err.Exception.Message;
                     }
                 }
-                actionContext.Result = new BadRequestObjectResult(ServiceResult<string>.Instance.ErrorResult(ServiceResultCode.InvalidModel, msg));
+                if (actionContext.ModelState.Count > 0)
+                {
+                    actionContext.Result = new BadRequestObjectResult(ServiceResult<string>.Instance.ErrorResult(ServiceResultCode.InvalidModel, msg));
+                }                
                 return;
             }
         }

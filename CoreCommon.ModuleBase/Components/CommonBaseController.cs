@@ -29,7 +29,7 @@ namespace CoreCommon.ModuleBase.Components
 
         protected string GetIpAddress()
         {
-            return HttpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
+            return HttpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? Request.HttpContext.Connection.RemoteIpAddress.ToString();
         }
 
         protected string GetFromHeader(string headerName)
