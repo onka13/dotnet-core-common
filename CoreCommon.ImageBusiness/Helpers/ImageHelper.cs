@@ -1,5 +1,4 @@
-﻿using Drawing = System.Drawing;
-using System.IO;
+﻿using System.IO;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -110,7 +109,7 @@ namespace CoreCommon.ImageBusiness.Helpers
                 };
             }
         }
-        
+
         public static MemoryStream CropImage(Stream stream, int x, int y, int w, int h, string extension = "jpg")
         {
             stream.Seek(0, SeekOrigin.Begin);
@@ -130,29 +129,11 @@ namespace CoreCommon.ImageBusiness.Helpers
 
         public static MemoryStream CropImage(Image image, int x, int y, int w, int h, string extension = "jpg")
         {
-            image.Mutate(o => o
-                    .Crop(new Rectangle(x, y, w, h))
-                 );
-            var memoryStream = new MemoryStream();
-            IImageEncoder encoder;
-            if (extension == "jpg" || extension == ".jpg")
-            {
-                encoder = new JpegEncoder
-                {
-                    Quality = 75
-                };
-            }
-            else
-            {
-                encoder = new PngEncoder();
-            }
-
-            image.Save(memoryStream, encoder);
-            memoryStream.Seek(0, SeekOrigin.Begin);
-            return memoryStream;
+            image.Mutate(o => o.Crop(new Rectangle(x, y, w, h)));
+            return ToStream(image, extension);
         }
 
-        public static MemoryStream WatermarkImage(Stream stream, Stream watermarkStream, string format = "jpg")
+        public static MemoryStream WatermarkImage(Stream stream, Stream watermarkStream, double ratio = 0.4, string format = "jpg")
         {
             try
             {
@@ -165,23 +146,21 @@ namespace CoreCommon.ImageBusiness.Helpers
             {
                 var msg = ex.Message;
             }
-            using (var watermarkImage = Drawing.Image.FromStream(watermarkStream))
-            using (var image = Drawing.Image.FromStream(stream))
-            using (var imageGraphics = Drawing.Graphics.FromImage(image))
+
+            var img1 = Image.Load(stream);
+            int w = (int)(img1.Width * ratio);
+            int h = (int)(img1.Height * ratio);
+
+            var watermarkImage = Image.Load(ResizeImage(watermarkStream, w, h, false, "png"));
+            int x = (img1.Width - watermarkImage.Width) / 2;
+            int y = (img1.Height - watermarkImage.Height) / 2;
+
+            img1.Mutate(imageContext =>
             {
-                //int x = (image.Width - watermarkImage.Width) / 2;
-                //int y = (image.Height - watermarkImage.Height) / 2;
-                int x = (int)(image.Width * 0.3);
-                int y = (int)(image.Height * 0.3);
-                int w = (int)(image.Width * 0.4); //watermarkImage.Width
-                int h = (int)(image.Height * 0.4); //(int)(image.Width * 0.3)
+                imageContext.DrawImage(watermarkImage, new Point(x, y), 1f);
+            });
 
-                imageGraphics.DrawImage(watermarkImage, x, y, w, h);
-
-                var finalStream = new MemoryStream();
-                image.Save(finalStream, format == "jpg" ? Drawing.Imaging.ImageFormat.Jpeg : Drawing.Imaging.ImageFormat.Png);
-                return finalStream;
-            }
+            return ToStream(img1, format);
         }
 
         public static async Task<Stream> GetStreamAsync(string url)
@@ -189,6 +168,26 @@ namespace CoreCommon.ImageBusiness.Helpers
             var client = new System.Net.Http.HttpClient();
             var array = await client.GetByteArrayAsync(url);
             return new MemoryStream(array);
+        }
+
+        public static MemoryStream ToStream(Image image, string format)
+        {
+            var memoryStream = new MemoryStream();
+            IImageEncoder encoder;
+            if (format == "jpg" || format == ".jpg")
+            {
+                encoder = new JpegEncoder
+                {
+                    Quality = 75
+                };
+            }
+            else
+            {
+                encoder = new PngEncoder();
+            }
+            image.Save(memoryStream, encoder);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return memoryStream;
         }
     }
 }
