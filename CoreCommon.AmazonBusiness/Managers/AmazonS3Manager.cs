@@ -48,10 +48,12 @@ namespace CoreCommon.AmazonBusiness.helpers
             catch (AmazonS3Exception e)
             {
                 Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+                throw e;
             }
             catch (Exception e)
             {
                 Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+                throw e;
             }
             return false;
         }
