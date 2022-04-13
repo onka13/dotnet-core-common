@@ -1,0 +1,69 @@
+{
+  "Projects": [
+    {
+      "Name": "CoreCommon.Infra",
+      "Path": "CoreCommon.Infra",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.Data.EntityFrameworkBase",
+      "Path": "CoreCommon.Data.EntityFrameworkBase",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.Data.Domain",
+      "Path": "CoreCommon.Data.Domain",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.Data.ElasticSearch",
+      "Path": "CoreCommon.Data.ElasticSearch",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.Business.Service",
+      "Path": "CoreCommon.Business.Service",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.Application.API",
+      "Path": "CoreCommon.Application.API",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.Data.RabbitMQ",
+      "Path": "CoreCommon.Data.RabbitMQ",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.Data.ServiceBus",
+      "Path": "CoreCommon.Data.ServiceBus",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.Data.MongoDBBase",
+      "Path": "CoreCommon.Data.MongoDBBase",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.AmazonBusiness",
+      "Path": "CoreCommon.AmazonBusiness",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.ImageBusiness",
+      "Path": "CoreCommon.ImageBusiness",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.ModuleBase",
+      "Path": "CoreCommon.ModuleBase",
+      "IsSelected": false
+    },
+    {
+      "Name": "CoreCommon.VSExtensionLib",
+      "Path": "CoreCommon.VSExtensionLib",
+      "IsSelected": false
+    }
+  ]
+}

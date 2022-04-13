@@ -129,12 +129,12 @@ namespace CoreCommon.Infra.Helpers
 
         // https://samueleresca.net/2016/12/developing-token-authentication-using-asp-net-core/
 
-        public static string EncryptTicket(string name, string secretKey, int expiryInMinutes, object userData)
+        public static string EncryptTicket(string name, string secretKey, TimeSpan expiration, object userData)
         {
             var serializedUserData = ConversionHelper.Serialize(userData);
 
             DateTime issuedAt = DateTime.UtcNow;
-            DateTime expires = DateTime.UtcNow.AddMinutes(expiryInMinutes);
+            DateTime expires = DateTime.UtcNow.Add(expiration);
 
             //http://stackoverflow.com/questions/18223868/how-to-encrypt-jwt-security-token
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -270,7 +270,7 @@ namespace CoreCommon.Infra.Helpers
         public static string HashHmac(string secret, string message)
         {
             Encoding encoding = Encoding.UTF8;
-            using (var hmac = new HMACSHA256(encoding.GetBytes(secret)))
+            using (var hmac = new HMACSHA512(encoding.GetBytes(secret)))
             {
                 var hash = hmac.ComputeHash(encoding.GetBytes(message));
                 return BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);

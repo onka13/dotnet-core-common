@@ -45,6 +45,7 @@ namespace CoreCommon.Business.Service.Base
             config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
             config.AddJsonFile($"appsettings.overrides.json", optional: true);
+            config.AddJsonFile($"appsettings.Local.json", optional: true);
             config.AddEnvironmentVariables();
         }
 

@@ -38,6 +38,16 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             System.Diagnostics.Debug.WriteLine("XXX DbContextBase Cons " + Name + " " + RefId);
         }
 
+        public string GetConfiguration(string key)
+        {
+            var value = Configuration[$"{Name}:{key}"];
+
+            if (!string.IsNullOrEmpty(Configuration[$"{Name}_{key}"]))
+                value = Configuration[$"{Name}_{key}"];
+
+            return value;
+        }
+
         /// <summary>
         /// Configure db context
         /// </summary>
@@ -50,21 +60,22 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
             {
                 if (string.IsNullOrEmpty(Provider))
                 {
-                    Provider = Configuration[Name + ":Provider"];
-                    ConnectionString = Configuration[Name + ":ConnectionString"];
+                    Provider = GetConfiguration("Provider");
                 }
 
-                if (!string.IsNullOrEmpty(Configuration[Name + "_ConnectionString"]))
+                if (string.IsNullOrEmpty(ConnectionString))
                 {
-                    Provider = Configuration[Name + "_Provider"];
-                    ConnectionString = Configuration[Name + "_ConnectionString"];
+                    ConnectionString = GetConfiguration("ConnectionString");
                 }
-            }             
+            }
 
             Provider = Provider?.ToLower() ?? "";
 
             //System.Console.WriteLine("Provider " + Provider);
             //System.Console.WriteLine("ConnectionString " + ConnectionString);
+
+            var dataPath = AppDomain.CurrentDomain.GetData("DataDirectory")?.ToString();
+            ConnectionString = ConnectionString?.Replace("[DataDirectory]", dataPath);
 
             if (Provider.Contains("mysql"))
             {
@@ -80,13 +91,21 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
                 else
                     optionsBuilder.UseNpgsql(ConnectionString);
             }
+            else if (Provider.Contains("cosmos"))
+            {
+                var endPoint = GetConfiguration("EndPoint") ?? GetConfiguration("DatabaseUrl");
+                var accountKey = GetConfiguration("AccountKey") ?? GetConfiguration("AuthKey");
+                var databaseName = GetConfiguration("DatabaseName");
+
+                optionsBuilder.UseCosmos(endPoint, accountKey, databaseName);
+            }
             else
             {
                 if (_connection != null)
                     optionsBuilder.UseSqlServer(_connection);
                 else
                     optionsBuilder.UseSqlServer(ConnectionString);
-            }            
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,30 +1,29 @@
-﻿using CoreCommon.Infra.Helpers;
-using System.Text;
+﻿using System;
 
 namespace CoreCommon.Data.ServiceBus.Models
 {
     public class MessageArgs
     {
         public string MessageId { get; set; }
-        public byte[] Body { get; set; }
+
+        public BinaryData Data { get; set; }
 
         /// <summary>
-        /// Get data as string
+        /// Get data as string.
         /// </summary>
         /// <returns></returns>
         public string GetDataAsString()
         {
-            return Encoding.UTF8.GetString(Body);
+            return Data.ToString();
         }
 
         /// <summary>
-        /// Convert data
+        /// Convert data.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public T GetDataAs<T>()
         {
-            return ConversionHelper.ByteArrayTo<T>(Body);
+            return Data.ToObjectFromJson<T>();
         }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CoreCommon.Data.ServiceBus.Models
 {
-    public class MessageOptions
+    public class MessageSessionOptions
     {
         public bool AutoCompleteMessages { get; set; }
 
@@ -12,10 +10,10 @@ namespace CoreCommon.Data.ServiceBus.Models
 
         public TimeSpan? SessionIdleTimeout { get; set; }
 
-        public int MaxConcurrent { get; set; }
+        public int MaxConcurrentSessions { get; set; }
 
-        public int MaxConcurrentCalls { get; set; }
+        public int MaxConcurrentCallsPerSession { get; set; }
 
-        public bool IsPeekLock { get; set; }
+        public bool ReceiveAndDelete { get; set; }
     }
 }

@@ -79,9 +79,10 @@ namespace CoreCommon.Infra.Helpers
         {
             return JsonConvert.SerializeObject(obj, isIndented ? Formatting.Indented : Formatting.None);
         }
-        
+
         public static T DerializeObject<T>(string value)
         {
+            if (string.IsNullOrWhiteSpace(value)) return default(T);
             return JsonConvert.DeserializeObject<T>(value);
         }
 

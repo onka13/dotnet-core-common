@@ -20,14 +20,12 @@ namespace CoreCommon.ModuleBase.Components
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var stateFilter = new ModelStateFilter();
-            stateFilter.OnActionExecuting(context);
-            //base.OnActionExecuting(context);
+            base.OnActionExecuting(context);
         }
 
         protected string GetIpAddress()
         {
-            return HttpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            return (HttpContextAccessor?.HttpContext ?? HttpContext).Connection.RemoteIpAddress.MapToIPv4().ToString();
         }
 
         protected string GetFromHeader(string headerName)
