@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 using System;
 
-namespace CoreCommon.Infra.Converters
+namespace CoreCommon.Infrastructure.Converters
 {
     /// <summary>
     /// DateTime converter for JSON serialization and deserialization

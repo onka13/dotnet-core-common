@@ -1,4 +1,4 @@
-﻿using CoreCommon.Data.Domain.Config;
+﻿using CoreCommon.Infrastructure.Domain.Config;
 using MailKit.Net.Smtp;
 using MimeKit;
 using System;
@@ -10,7 +10,7 @@ using System.Security.Authentication;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CoreCommon.Infra.Helpers
+namespace CoreCommon.Infrastructure.Helpers
 {
     /// <summary>
     /// Email Address Model

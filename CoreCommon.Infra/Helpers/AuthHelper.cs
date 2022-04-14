@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CoreCommon.Infra.Helpers
+namespace CoreCommon.Infrastructure.Helpers
 {
     /// <summary>
     /// Authentication Helpers
@@ -98,7 +98,7 @@ namespace CoreCommon.Infra.Helpers
 
                 if (validJwt == null)
                 {
-                    return default(T);
+                    return default;
                 }
 
                 //if (!validJwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.Ordinal))
@@ -111,7 +111,7 @@ namespace CoreCommon.Infra.Helpers
                 var userData = validJwt.Claims.ToList().FirstOrDefault(x => x.Type == ClaimTypes.UserData)?.Value;
                 if (string.IsNullOrWhiteSpace(userData))
                 {
-                    return default(T);
+                    return default;
                 }
                 return ConversionHelper.Deserialize<T>(userData);
             }
@@ -124,7 +124,7 @@ namespace CoreCommon.Infra.Helpers
                 // TODO: log exception
                 //throw ex;
             }
-            return default(T);
+            return default;
         }
 
         // https://samueleresca.net/2016/12/developing-token-authentication-using-asp-net-core/
@@ -205,7 +205,7 @@ namespace CoreCommon.Infra.Helpers
 
                 if (validJwt == null)
                 {
-                    return default(T);
+                    return default;
                 }
 
                 //if (!validJwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.Ordinal))
@@ -218,7 +218,7 @@ namespace CoreCommon.Infra.Helpers
                 var userData = validJwt.Claims.ToList().FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Nonce)?.Value;
                 if (string.IsNullOrWhiteSpace(userData))
                 {
-                    return default(T);
+                    return default;
                 }
                 return ConversionHelper.Deserialize<T>(userData);
             }
@@ -230,14 +230,14 @@ namespace CoreCommon.Infra.Helpers
             {
                 //throw ex;
             }
-            return default(T);
+            return default;
         }
 
         public static T DecryptTicket<T>(string encryptedTicket, string secretKey)
         {
             bool isExpired;
             var data = DecryptTicket<T>(encryptedTicket, secretKey, out isExpired);
-            return isExpired ? default(T) : data;
+            return isExpired ? default : data;
         }
 
         public static string CreateSalt()

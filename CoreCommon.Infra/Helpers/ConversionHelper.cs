@@ -1,4 +1,4 @@
-﻿using CoreCommon.Infra.Converters;
+﻿using CoreCommon.Infrastructure.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace CoreCommon.Infra.Helpers
+namespace CoreCommon.Infrastructure.Helpers
 {
     /// <summary>
     /// Conversion Helpers.
@@ -25,7 +25,7 @@ namespace CoreCommon.Infra.Helpers
 
             if (value == null)
             {
-                return default(T);
+                return default;
             }
 
             if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -82,7 +82,7 @@ namespace CoreCommon.Infra.Helpers
 
         public static T DerializeObject<T>(string value)
         {
-            if (string.IsNullOrWhiteSpace(value)) return default(T);
+            if (string.IsNullOrWhiteSpace(value)) return default;
             return JsonConvert.DeserializeObject<T>(value);
         }
 
@@ -108,7 +108,7 @@ namespace CoreCommon.Infra.Helpers
         {
             try
             {
-                if (value == null) return default(T);
+                if (value == null) return default;
                 return Deserialize<T>(value.ToString());
             }
             catch
@@ -123,7 +123,7 @@ namespace CoreCommon.Infra.Helpers
                 {
 
                 }
-                return default(T);
+                return default;
             }
         }
 

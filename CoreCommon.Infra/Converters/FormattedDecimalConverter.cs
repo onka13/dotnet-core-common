@@ -2,7 +2,7 @@
 using System;
 using System.Globalization;
 
-namespace CoreCommon.Infra.Converters
+namespace CoreCommon.Infrastructure.Converters
 {
     /// <summary>
     /// Decimal converter for JSON serialization and deserialization
@@ -18,9 +18,9 @@ namespace CoreCommon.Infra.Converters
 
         public override bool CanConvert(Type objectType)
         {
-            return (objectType == typeof(decimal) ||
+            return objectType == typeof(decimal) ||
                     objectType == typeof(double) ||
-                    objectType == typeof(float));
+                    objectType == typeof(float);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

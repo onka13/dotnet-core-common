@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CoreCommon.Infra.Helpers
+namespace CoreCommon.Infrastructure.Helpers
 {
     /// <summary>
     /// Url helpers
@@ -60,7 +60,7 @@ namespace CoreCommon.Infra.Helpers
                     result.Status = -1;
                     result.Reason = "Timeout";
                     // a web request timeout (possibly other things!?)
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -73,7 +73,7 @@ namespace CoreCommon.Infra.Helpers
 
             return result;
         }
-    
+
         public static string GetNiceFileName(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return text;
