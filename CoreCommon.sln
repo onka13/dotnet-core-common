@@ -29,6 +29,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.ModuleBase", "Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreCommon.VSExtensionLib", "CoreCommon.VSExtensionLib\CoreCommon.VSExtensionLib.csproj", "{0FE19488-C0F4-4441-9F85-C31F8A793A46}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.Data.RedisCache", "CoreCommon.Data.RedisCache\CoreCommon.Data.RedisCache.csproj", "{5E426BAF-606D-4F75-9F58-A6CCC14BE6F3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.StripeAPI", "CoreCommon.StripeAPI\CoreCommon.StripeAPI.csproj", "{C3651CFC-2C28-4422-B9B6-6EA80283ACA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +91,14 @@ Global
 		{0FE19488-C0F4-4441-9F85-C31F8A793A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FE19488-C0F4-4441-9F85-C31F8A793A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FE19488-C0F4-4441-9F85-C31F8A793A46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E426BAF-606D-4F75-9F58-A6CCC14BE6F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E426BAF-606D-4F75-9F58-A6CCC14BE6F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E426BAF-606D-4F75-9F58-A6CCC14BE6F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E426BAF-606D-4F75-9F58-A6CCC14BE6F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3651CFC-2C28-4422-B9B6-6EA80283ACA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3651CFC-2C28-4422-B9B6-6EA80283ACA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3651CFC-2C28-4422-B9B6-6EA80283ACA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3651CFC-2C28-4422-B9B6-6EA80283ACA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
