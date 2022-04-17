@@ -1,4 +1,4 @@
-﻿using CoreCommon.Data.Domain.Business;
+﻿using CoreCommon.Infrastructure.Domain.Business.Crud;
 using Nest;
 using System;
 using System.Collections.Generic;

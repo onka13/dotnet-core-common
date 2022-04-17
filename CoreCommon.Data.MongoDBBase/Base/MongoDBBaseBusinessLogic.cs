@@ -1,4 +1,5 @@
-﻿using CoreCommon.Data.Domain.Business;
+﻿using CoreCommon.Infrastructure.Domain.Business;
+using CoreCommon.Infrastructure.Domain.Business.Queryable;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;

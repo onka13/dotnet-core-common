@@ -1,4 +1,4 @@
-﻿using CoreCommon.Data.Domain.Business;
+﻿using CoreCommon.Infrastructure.Domain.Business;
 using Microsoft.Extensions.Configuration;
 using Nest;
 using System;

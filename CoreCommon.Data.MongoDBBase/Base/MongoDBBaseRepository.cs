@@ -1,13 +1,10 @@
-﻿using CoreCommon.Data.Domain.Business;
-using CoreCommon.Data.Domain.Config;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using MongoDB.Driver;
 using System.Linq;
-using Microsoft.Extensions.Configuration;
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
+using CoreCommon.Infrastructure.Domain.Business;
 
 namespace CoreCommon.Data.MongoDBBase.Base
 {

@@ -6,7 +6,6 @@ using MongoDB.Driver;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CoreCommon.Infra.Helpers;
 using CoreCommon.Data.MongoDBBase.Serializers;
 
 namespace CoreCommon.Data.MongoDBBase.Base

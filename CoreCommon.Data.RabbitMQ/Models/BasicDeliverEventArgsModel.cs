@@ -1,4 +1,4 @@
-﻿using CoreCommon.Infra.Helpers;
+﻿using CoreCommon.Infrastructure.Helpers;
 using System;
 using System.Text;
 

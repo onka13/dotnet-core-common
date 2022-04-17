@@ -1,4 +1,4 @@
-﻿using CoreCommon.Data.Domain.Business;
+﻿using CoreCommon.Infrastructure.Domain.Business.Queryable;
 
 namespace CoreCommon.Data.MongoDBBase.Base
 {

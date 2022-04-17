@@ -1,6 +1,4 @@
-﻿using Nest;
-
-namespace CoreCommon.Data.ElasticSearch.Base
+﻿namespace CoreCommon.Data.ElasticSearch.Base
 {
     /// <summary>
     /// Default elastic search entity interface
