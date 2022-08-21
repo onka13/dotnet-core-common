@@ -212,5 +212,10 @@ namespace CoreCommon.Data.MongoDBBase.Base
                 PreserveNullAndEmptyArrays = true
             };
         }
+
+        public int EditExcept(TDocument entity, params Expression<Func<TDocument, object>>[] exclude)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

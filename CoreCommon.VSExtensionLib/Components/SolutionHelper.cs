@@ -14,6 +14,7 @@ namespace CoreTemplateExtensionLibrary.Components
     public static class SolutionHelper
     {
         private static DTE _dteObj;
+        private static Solution _solution;
         private static List<Project> allProjects;
         private static List<SolutionFolder> allFolders;
         static string vsProjectKindSolutionFolder = "{66A26720-8FB5-11D2-AA7E-00C04F688DDE}";
@@ -21,6 +22,10 @@ namespace CoreTemplateExtensionLibrary.Components
         public static void SetDTE(EnvDTE.DTE dte)
         {
             _dteObj = dte;
+        } 
+        public static void SetSolution(Solution solution)
+        {
+            _solution = solution;
         }
 
         public static void Clear()
@@ -31,7 +36,14 @@ namespace CoreTemplateExtensionLibrary.Components
 
         public static Solution GetSolution()
         {
-            return _dteObj?.Solution ?? new Solution();
+            try
+            {
+                return _solution ?? new Solution();
+            }
+            catch
+            {
+                return new Solution();
+            }
         }
 
         public static Project GetProject(string projectName)
