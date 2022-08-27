@@ -1,4 +1,4 @@
-﻿namespace CoreCommon.Infrastructure.Domain.Config
+﻿namespace CoreCommon.Infra.Domain.Config
 {
     public class DatabaseConfig
     {

@@ -1,4 +1,4 @@
-﻿namespace CoreCommon.Infrastructure.Domain.Business
+﻿namespace CoreCommon.Infra.Domain.Business
 {
     /// <summary>
     /// Base service result codes

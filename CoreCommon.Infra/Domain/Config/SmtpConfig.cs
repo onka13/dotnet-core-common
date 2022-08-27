@@ -1,4 +1,4 @@
-﻿namespace CoreCommon.Infrastructure.Domain.Config
+﻿namespace CoreCommon.Infra.Domain.Config
 {
     /// <summary>
     /// Email configuration model which defined in appsettings.

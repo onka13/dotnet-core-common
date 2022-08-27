@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CoreCommon.Infrastructure.Domain.Business;
+using CoreCommon.Infra.Domain.Business;
 
-namespace CoreCommon.Infrastructure.Exceptions
+namespace CoreCommon.Infra.Exceptions
 {
     public static class ExceptionResolver
     {

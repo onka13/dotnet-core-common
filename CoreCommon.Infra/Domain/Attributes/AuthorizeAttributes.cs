@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace CoreCommon.Infrastructure.Domain.Attributes
+namespace CoreCommon.Infra.Domain.Attributes
 {
     public class UserAuthorizeAttribute : Attribute
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace CoreCommon.Infrastructure.Domain.Business
+namespace CoreCommon.Infra.Domain.Business
 {
     public class RepositoryBase<TEntity>
     {

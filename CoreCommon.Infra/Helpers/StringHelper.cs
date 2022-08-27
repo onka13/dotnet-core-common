@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Linq;
 
-namespace CoreCommon.Infrastructure.Helpers
+namespace CoreCommon.Infra.Helpers
 {
     public class StringHelper
     {

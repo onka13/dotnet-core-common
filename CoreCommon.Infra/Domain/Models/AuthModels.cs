@@ -1,4 +1,4 @@
-﻿namespace CoreCommon.Infrastructure.Domain.Models
+﻿namespace CoreCommon.Infra.Domain.Models
 {
     public class AuthResponse
     {

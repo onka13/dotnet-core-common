@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace CoreCommon.Infrastructure.Domain.Models
+namespace CoreCommon.Infra.Domain.Models
 {
     public enum FileType : byte
     {

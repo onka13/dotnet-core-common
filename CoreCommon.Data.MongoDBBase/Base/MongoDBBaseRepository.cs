@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using MongoDB.Driver;
 using System.Linq;
 using MongoDB.Bson;
-using CoreCommon.Infrastructure.Domain.Business;
+using CoreCommon.Infra.Domain.Business;
 
 namespace CoreCommon.Data.MongoDBBase.Base
 {

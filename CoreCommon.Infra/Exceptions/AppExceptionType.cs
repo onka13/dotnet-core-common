@@ -1,4 +1,4 @@
-﻿namespace CoreCommon.Infrastructure.Exceptions
+﻿namespace CoreCommon.Infra.Exceptions
 {
     public enum AppExceptionType : byte
     {

@@ -2,7 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CoreCommon.Infrastructure.Helpers
+namespace CoreCommon.Infra.Helpers
 {
     public class StreamHelper
     {

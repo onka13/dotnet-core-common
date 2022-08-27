@@ -1,4 +1,4 @@
-﻿namespace CoreCommon.Infrastructure.Domain.Entitites
+﻿namespace CoreCommon.Infra.Domain.Entitites
 {
     /// <summary>
     /// Base entity interface

@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CoreCommon.Infrastructure.Helpers
+namespace CoreCommon.Infra.Helpers
 {
     /// <summary>
     /// Authentication Helpers

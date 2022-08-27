@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 
-namespace CoreCommon.Infrastructure.Logging
+namespace CoreCommon.Infra.Logging
 {
     public interface ILogService
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CoreCommon.Infrastructure.Domain.Business.Crud
+namespace CoreCommon.Infra.Domain.Business.Crud
 {
     /// <summary>
     /// Repository base interface

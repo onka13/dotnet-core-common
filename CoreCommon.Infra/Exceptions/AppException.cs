@@ -1,8 +1,8 @@
 ﻿using System;
-using CoreCommon.Infrastructure.Domain.Business;
+using CoreCommon.Infra.Domain.Business;
 using Microsoft.Extensions.Logging;
 
-namespace CoreCommon.Infrastructure.Exceptions
+namespace CoreCommon.Infra.Exceptions
 {
     public class AppException : Exception
     {

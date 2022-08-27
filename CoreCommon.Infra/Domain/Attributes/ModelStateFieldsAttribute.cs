@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CoreCommon.Infrastructure.Domain.Attributes
+namespace CoreCommon.Infra.Domain.Attributes
 {
     public class ModelStateFieldsAttribute : Attribute
     {

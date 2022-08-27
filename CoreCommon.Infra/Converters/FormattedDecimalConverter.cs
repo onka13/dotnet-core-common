@@ -2,7 +2,7 @@
 using System;
 using System.Globalization;
 
-namespace CoreCommon.Infrastructure.Converters
+namespace CoreCommon.Infra.Converters
 {
     /// <summary>
     /// Decimal converter for JSON serialization and deserialization

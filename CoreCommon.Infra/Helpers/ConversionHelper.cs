@@ -1,4 +1,4 @@
-﻿using CoreCommon.Infrastructure.Converters;
+﻿using CoreCommon.Infra.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace CoreCommon.Infrastructure.Helpers
+namespace CoreCommon.Infra.Helpers
 {
     /// <summary>
     /// Conversion Helpers.

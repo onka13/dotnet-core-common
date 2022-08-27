@@ -1,10 +1,10 @@
-﻿using CoreCommon.Infrastructure.Domain.Business;
-using CoreCommon.Infrastructure.Domain.Business.Crud;
+﻿using CoreCommon.Infra.Domain.Business;
+using CoreCommon.Infra.Domain.Business.Crud;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace CoreCommon.Infrastructure.Domain.Business.Queryable
+namespace CoreCommon.Infra.Domain.Business.Queryable
 {
     /// <summary>
     /// Business logic base interface

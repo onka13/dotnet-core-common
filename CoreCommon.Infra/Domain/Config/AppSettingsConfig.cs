@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CoreCommon.Infrastructure.Domain.Config
+namespace CoreCommon.Infra.Domain.Config
 {
     /// <summary>
     /// App configuration model which defined in appsettings.

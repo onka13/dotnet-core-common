@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CoreCommon.Infrastructure.Domain.Business
+namespace CoreCommon.Infra.Domain.Business
 {
     /// <summary>
     /// Service result interface.

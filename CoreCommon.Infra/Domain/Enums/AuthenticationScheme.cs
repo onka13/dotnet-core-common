@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace CoreCommon.Infrastructure.Domain.Enums
+namespace CoreCommon.Infra.Domain.Enums
 {
     public enum AuthenticationScheme
     {

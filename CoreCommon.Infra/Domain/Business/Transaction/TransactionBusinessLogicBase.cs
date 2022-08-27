@@ -1,9 +1,9 @@
-﻿using CoreCommon.Infrastructure.Domain.Business.Queryable;
+﻿using CoreCommon.Infra.Domain.Business.Queryable;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace CoreCommon.Infrastructure.Domain.Business.Transaction
+namespace CoreCommon.Infra.Domain.Business.Transaction
 {
     /// <summary>
     /// Business logic base crud

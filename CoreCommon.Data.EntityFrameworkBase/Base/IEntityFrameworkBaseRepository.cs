@@ -1,4 +1,4 @@
-﻿using CoreCommon.Infrastructure.Domain.Business.Transaction;
+﻿using CoreCommon.Infra.Domain.Business.Transaction;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
