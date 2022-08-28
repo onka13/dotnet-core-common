@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CoreCommon.Data.Domain\CoreCommon.Data.Domain.csproj" />
-    <ProjectReference Include="..\CoreCommon.Infra\CoreCommon.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
