@@ -1,7 +1,8 @@
-﻿using CoreCommon.Data.Domain.Business;
+﻿using CoreCommon.Data.Domain.Business.Queryable;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace CoreCommon.Data.MongoDBBase.Base
 {
@@ -11,6 +12,6 @@ namespace CoreCommon.Data.MongoDBBase.Base
                                                                                     Expression<Func<TDocument, object>> localField,
                                                                                     Expression<Func<TForeignDocument, object>> foreignField,
                                                                                     Expression<Func<TDocument, object>> bindField);
-        List<dynamic> RawJsonQuery<T>(string json);
+        Task<List<dynamic>> RawJsonQuery<T>(string json);
     }
 }

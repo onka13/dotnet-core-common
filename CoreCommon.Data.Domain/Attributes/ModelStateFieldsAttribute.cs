@@ -4,12 +4,23 @@ using System.Linq;
 
 namespace CoreCommon.Data.Domain.Attributes
 {
+    /// <summary>
+    /// ModelStateFieldsAttribute.
+    /// </summary>
     public class ModelStateFieldsAttribute : Attribute
     {
-        public List<string> Names { get; set; }
-        public ModelStateFieldsAttribute(string[] _names)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelStateFieldsAttribute"/> class.
+        /// </summary>
+        /// <param name="names">Names.</param>
+        public ModelStateFieldsAttribute(string[] names)
         {
-            Names = _names.ToList();
+            Names = names.ToList();
         }
+
+        /// <summary>
+        /// Gets or sets Names.
+        /// </summary>
+        public List<string> Names { get; set; }
     }
 }

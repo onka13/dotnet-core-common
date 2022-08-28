@@ -62,6 +62,12 @@ namespace CoreCommon.ModuleBase.Components
             return Json(response);
         }
 
+        protected IActionResult SuccessListResponse(List<object> resultValue, long total)
+        {
+            var response = ServiceListResult<object>.Instance.SuccessResult(resultValue, total);
+            return Json(response);
+        }
+
         /// <summary>
         /// Returns invalid models as ServiceResult error.
         /// </summary>

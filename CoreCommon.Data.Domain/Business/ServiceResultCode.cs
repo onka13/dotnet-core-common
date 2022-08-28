@@ -1,7 +1,7 @@
 ﻿namespace CoreCommon.Data.Domain.Business
 {
     /// <summary>
-    /// Base service result codes
+    /// Base service result codes.
     /// </summary>
     public class ServiceResultCode
     {
@@ -13,6 +13,7 @@
         public const int NoPermission = -2;
         public const int EmptyModel = -10;
         public const int InvalidModel = -11;
-        public const int NotFound = -12;        
+        public const int NotFound = -12;
+        public const int NoRowsAffected = -30;
     }
 }

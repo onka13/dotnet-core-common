@@ -5,12 +5,8 @@ using System.Linq;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using CoreCommon.Data.Domain.Models;
-using System.Security.Cryptography;
-using System.Text;
-using ThirdParty.BouncyCastle.Math;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using CoreCommon.Infra.Helpers;
 
 namespace CoreCommon.AmazonBusiness.helpers
 {

@@ -1,24 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using CoreCommon.Data.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoreCommon.Data.Domain.Business
 {
     public class RepositoryBase<TEntity>
     {
-        public virtual List<object> SkipTake(IEnumerable<object> result, int skip, int take, out long total)
+        public virtual async Task<SearchResult> SkipTake(IQueryable<object> query, int skip, int take)
         {
+            var result = new SearchResult();
             if (take > 0)
             {
-                total = result.Count();
-                result = result.Skip(skip).Take(take);
+                // total = skip + take + 1;
+                result.Total = await query.CountAsync();
+                query = query.Skip(skip).Take(take);
             }
-            else
+
+            result.Items = await query.Select(x => x).ToListAsync();
+            return result;
+        }
+
+        public virtual async Task<SearchResult> SkipTakeLazy(IQueryable<object> query, int skip, int take)
+        {
+            var items = await query.Skip(skip).Take(take + 1).Select(x => x).ToListAsync();
+            return new SearchResult
             {
-                total = 0;
-            }
-            return result.Select(x => (object)x).ToList();
+                Total = skip + items.Count,
+                Items = items.Take(take).ToList(),
+            };
         }
 
         public Expression<Func<TEntity, T>> Projection<T>(Expression<Func<TEntity, T>> projection)
@@ -48,11 +60,14 @@ namespace CoreCommon.Data.Domain.Business
                             continue;
                         }
                     }
-                    
-                    
-                    if (name.Equals(orderBy, StringComparison.InvariantCultureIgnoreCase)) return field;
+
+                    if (name.Equals(orderBy, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return field;
+                    }
                 }
             }
+
             return null;
         }
     }
