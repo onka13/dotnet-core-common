@@ -4,9 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using CoreCommon.Infrastructure.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using CoreCommon.Infrastructure.Data.Infra.Converters;
 
 namespace CoreCommon.Infrastructure.Helpers
 {

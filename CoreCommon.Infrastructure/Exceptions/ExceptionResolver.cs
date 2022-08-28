@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CoreCommon.Data.Domain.Business;
+using CoreCommon.Data.Domain.Models;
 
 namespace CoreCommon.Infrastructure.Exceptions
 {
@@ -19,7 +20,7 @@ namespace CoreCommon.Infrastructure.Exceptions
         /// </summary>
         public static async Task<ServiceResult<string>> CatchAsync(this Task task)
         {
-            return await task.CatchAsync<CoreCommonException>();
+            return await task.CatchAsync<AppException>();
         }
 
         /// <summary>
@@ -27,7 +28,7 @@ namespace CoreCommon.Infrastructure.Exceptions
         /// </summary>
         public static async Task<ServiceResult<T>> CatchAsync<T>(this Task<T> task)
         {
-            return await task.CatchAsync<CoreCommonException, T>();
+            return await task.CatchAsync<AppException, T>();
         }
 
         public static async Task<ServiceResult<T>> CatchAsync<TException, T>(this Task<T> task)
@@ -46,9 +47,9 @@ namespace CoreCommon.Infrastructure.Exceptions
             }
             catch (TException ex)
             {
-                if (ex is CoreCommonException)
+                if (ex is AppException)
                 {
-                    return (ex as CoreCommonException).ToServiceResult<T>();
+                    return (ex as AppException).ToServiceResult<T>();
                 }
 
                 return response.ErrorResult(0, ex);
@@ -66,9 +67,9 @@ namespace CoreCommon.Infrastructure.Exceptions
             }
             catch (TException ex)
             {
-                if (ex is CoreCommonException)
+                if (ex is AppException)
                 {
-                    return (ex as CoreCommonException).ToServiceResult<string>();
+                    return (ex as AppException).ToServiceResult<string>();
                 }
 
                 return response.ErrorResult(0, ex);
@@ -81,9 +82,9 @@ namespace CoreCommon.Infrastructure.Exceptions
             {
                 return await task;
             }
-            catch (CoreCommonException innerException)
+            catch (AppException innerException)
             {
-                var ex = new CoreCommonException(code: 500, message: innerException.Message, innerException: innerException);
+                var ex = new AppException(code: 500, message: innerException.Message, innerException: innerException);
                 throw ex;
             }
         }

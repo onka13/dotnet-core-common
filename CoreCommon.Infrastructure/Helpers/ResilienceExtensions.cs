@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CoreCommon.Data.Domain.Models;
+using System;
 using System.Threading.Tasks;
-using CoreCommon.Infrastructure.Data.Infra.Exceptions;
 
 namespace CoreCommon.Infrastructure.Helpers
 {
@@ -17,7 +17,7 @@ namespace CoreCommon.Infrastructure.Helpers
         {
             if (maxRetry < retry)
             {
-                throw new CoreCommonException("Max retry exhausted. Max retry {maxRetry}", maxRetry);
+                throw new AppException("Max retry exhausted. Max retry {maxRetry}", maxRetry);
             }
 
             try

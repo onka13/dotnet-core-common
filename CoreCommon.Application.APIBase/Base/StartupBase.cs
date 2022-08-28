@@ -2,7 +2,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CoreCommon.Application.APIBase.Helpers;
-using CoreCommon.Application.APIBase.Services;
 using CoreCommon.Data.Domain.Config;
 using CoreCommon.Data.EntityFrameworkBase.Managers;
 using CoreCommon.Infrastructure.Helpers;
