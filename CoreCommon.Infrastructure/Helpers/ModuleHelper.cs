@@ -12,6 +12,12 @@ namespace CoreCommon.Infrastructure.Helpers
     /// </summary>
     public class ModuleHelper
     {
+        public static List<string> AssemblyPatterns { get; set; } = new List<string>
+        {
+            "CoreCommon*.dll",
+            "Module*.dll",
+        };
+
         /// <summary>
         /// List of the defined modules.
         /// </summary>
@@ -45,9 +51,7 @@ namespace CoreCommon.Infrastructure.Helpers
 
         public static List<Assembly> FindAllAssemblies()
         {
-            return Directory.GetFiles(AppContext.BaseDirectory, "CoreCommon*.dll")
-                .Select(Assembly.LoadFrom)
-                .ToList();
+            return AssemblyPatterns.SelectMany(x => Directory.GetFiles(AppContext.BaseDirectory, x)).Distinct().Select(Assembly.LoadFrom).ToList();
         }
     }
 }

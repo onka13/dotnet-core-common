@@ -1,18 +1,13 @@
 ﻿using CoreCommon.Data.Domain.Business;
-using CoreCommon.Data.Domain.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using MongoDB.Driver;
 using System.Linq;
-using Microsoft.Extensions.Configuration;
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
 using System.Threading.Tasks;
 using CoreCommon.Data.Domain.Business.Queryable;
-using CoreCommon.Data.Domain.Business.Crud;
 using CoreCommon.Data.Domain.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace CoreCommon.Data.MongoDBBase.Base
 {
@@ -58,7 +53,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
         public async Task<List<TDocument>> FindBy(Expression<Func<TDocument, bool>> predicate, bool includeRelations)
         {
             if (!includeRelations)
-                return await GetQueryable().Where(predicate).ToListAsync();
+                return await Collection.Find(predicate).ToListAsync();
             return await GetRelationAggregate().Match(predicate).ToListAsync();
         }
 
@@ -70,7 +65,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
         public async Task<List<TDocument>> FindBy(Expression<Func<TDocument, bool>> predicate, int skip, int take, bool includeRelations)
         {
             if (!includeRelations)
-                return await GetQueryable().Where(predicate).Skip(skip).Take(take).ToListAsync();
+                return await Collection.Find(predicate).Skip(skip).Limit(take).ToListAsync();
             return await GetRelationAggregate().Match(predicate).Skip(skip).Limit(take).ToListAsync();
         }
 

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using CoreCommon.Data.Domain.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace CoreCommon.Data.Domain.Business
 {
@@ -15,17 +14,17 @@ namespace CoreCommon.Data.Domain.Business
             if (take > 0)
             {
                 // total = skip + take + 1;
-                result.Total = await query.CountAsync();
+                result.Total = query.Count();
                 query = query.Skip(skip).Take(take);
             }
 
-            result.Items = await query.Select(x => x).ToListAsync();
+            result.Items = query.Select(x => x).ToList();
             return result;
         }
 
         public virtual async Task<SearchResult> SkipTakeLazy(IQueryable<object> query, int skip, int take)
         {
-            var items = await query.Skip(skip).Take(take + 1).Select(x => x).ToListAsync();
+            var items = query.Skip(skip).Take(take + 1).Select(x => x).ToList();
             return new SearchResult
             {
                 Total = skip + items.Count,

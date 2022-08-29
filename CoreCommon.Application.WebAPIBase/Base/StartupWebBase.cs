@@ -20,13 +20,7 @@ namespace CoreCommon.Application.WebAPIBase.Base
     /// </summary>
     public abstract class StartupWebBase : StartupBase
     {
-        public string[] Origins { get; set; } = new string[]
-        {
-            "http://localhost:8080",
-            "http://localhost:3001",
-            "http://localhost:3002",
-            "http://localhost:49300",
-        };
+        public string[] Origins { get; set; } = new string[] { };
 
         /// <summary>
         /// Configure application.
@@ -146,7 +140,7 @@ namespace CoreCommon.Application.WebAPIBase.Base
                 c.AddServer(new Microsoft.OpenApi.Models.OpenApiServer { Url = $"/{Configuration["SettingName"]}/{Configuration["ProjectName"]}" });
                 c.AddServer(new Microsoft.OpenApi.Models.OpenApiServer { Url = "/" });
                 c.SwaggerDoc("v-1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = Configuration["ProjectName"] + " API", Version = "v-1" });
-                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.FirstOrDefault());
                 c.CustomSchemaIds(type => type.ToString());
             });
 

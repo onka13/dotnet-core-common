@@ -38,6 +38,16 @@ namespace CoreCommon.ModuleBase.Components
             return null;
         }
 
+        public override JsonResult Json(object data)
+        {
+            if (data.GetType().GetInterface(nameof(IServiceResult)) == null)
+            {
+                return base.Json(ServiceResult<object>.Instance.SuccessResult(data));
+            }
+
+            return base.Json(data);
+        }
+
         protected IActionResult SuccessResponse(object msg = null, int resultCode = 0)
         {
             var response = ServiceResult<object>.Instance.SuccessResult(msg, resultCode);
