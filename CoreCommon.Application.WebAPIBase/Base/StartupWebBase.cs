@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Autofac;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -64,10 +66,7 @@ namespace CoreCommon.Application.WebAPIBase.Base
 
             app.UseMiddleware<HttpHeadersMiddleware>();
 
-            app.UseSwagger(c =>
-            {
-                c.RouteTemplate = "swg/{documentname}/swagger.json";
-            });
+            app.UseSwagger(c => { c.RouteTemplate = "swg/{documentname}/swagger.json"; });
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
@@ -81,10 +80,12 @@ namespace CoreCommon.Application.WebAPIBase.Base
             {
                 endpoints.MapControllers();
 
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync($"{Configuration["ProjectName"]} project is running. v{Configuration["Version"]}");
-                });
+                endpoints.MapGet("/",
+                    async context =>
+                    {
+                        await context.Response.WriteAsync(
+                            $"{Configuration["ProjectName"]} project is running. v{Configuration["Version"]}");
+                    });
             });
         }
 
@@ -102,9 +103,9 @@ namespace CoreCommon.Application.WebAPIBase.Base
                 o.AddDefaultPolicy(builder =>
                 {
                     builder.WithOrigins(Origins)
-                           .AllowAnyMethod()
-                           .AllowAnyHeader()
-                           .AllowCredentials();
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
                 });
             });
 
@@ -137,11 +138,39 @@ namespace CoreCommon.Application.WebAPIBase.Base
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.AddServer(new Microsoft.OpenApi.Models.OpenApiServer { Url = $"/{Configuration["SettingName"]}/{Configuration["ProjectName"]}" });
+                c.AddServer(new Microsoft.OpenApi.Models.OpenApiServer
+                    { Url = $"/{Configuration["SettingName"]}/{Configuration["ProjectName"]}" });
                 c.AddServer(new Microsoft.OpenApi.Models.OpenApiServer { Url = "/" });
-                c.SwaggerDoc("v-1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = Configuration["ProjectName"] + " API", Version = "v-1" });
+                c.SwaggerDoc("v-1",
+                    new Microsoft.OpenApi.Models.OpenApiInfo { Title = Configuration["ProjectName"] + " API", Version = "v-1" });
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.FirstOrDefault());
                 c.CustomSchemaIds(type => type.ToString());
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.ApiKey,
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme = "Bearer",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                    }
+                });
             });
 
             services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
@@ -150,10 +179,7 @@ namespace CoreCommon.Application.WebAPIBase.Base
                 options.ValueLengthLimit = 1024 * 1024 * 100; // 100MB max len form data
             });
 
-            services.AddMvc(options =>
-            {
-                options.Conventions.Add(new ModelBindingConvention());
-            }).AddNewtonsoftJson(o =>
+            services.AddMvc(options => { options.Conventions.Add(new ModelBindingConvention()); }).AddNewtonsoftJson(o =>
             {
                 o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 o.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
