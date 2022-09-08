@@ -149,7 +149,7 @@ namespace CoreCommon.Application.WebAPIBase.Base
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Type = SecuritySchemeType.ApiKey,
-                    Name = "Authorization",
+                    Name = "token",
                     In = ParameterLocation.Header,
                     Scheme = "Bearer"
                 });
@@ -165,7 +165,7 @@ namespace CoreCommon.Application.WebAPIBase.Base
                                 Id = "Bearer"
                             },
                             Scheme = "Bearer",
-                            Name = "Bearer",
+                            Name = "token",
                             In = ParameterLocation.Header,
                         },
                         new List<string>()
