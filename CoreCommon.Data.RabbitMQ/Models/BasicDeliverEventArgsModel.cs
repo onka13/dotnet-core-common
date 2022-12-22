@@ -1,6 +1,6 @@
-﻿using CoreCommon.Infra.Helpers;
-using System;
+﻿using System;
 using System.Text;
+using CoreCommon.Infrastructure.Helpers;
 
 namespace CoreCommon.Data.RabbitMQ.Models
 {
@@ -33,15 +33,6 @@ namespace CoreCommon.Data.RabbitMQ.Models
         // Summary:
         //     The routing key used when the message was originally published.
         public string RoutingKey { get; set; }
-
-        /// <summary>
-        /// Get data as string
-        /// </summary>
-        /// <returns></returns>
-        public string GetDataAsString()
-        {
-            return Encoding.UTF8.GetString(Body.ToArray());
-        }
         
         /// <summary>
         /// Convert data
@@ -50,7 +41,7 @@ namespace CoreCommon.Data.RabbitMQ.Models
         /// <returns></returns>
         public T GetDataAs<T>()
         {
-            return ConversionHelper.ByteArrayTo<T>(Body.ToArray());
+            return new BinaryData(Body.ToArray()).ToObjectFromJson<T>();
         }
     }
 }

@@ -88,20 +88,9 @@ namespace CoreCommon.Data.RabbitMQ.Helpers
             }
         }
 
-        /// <summary>
-        /// Send message to queue
-        /// </summary>
-        /// <param name="queue"></param>
-        /// <param name="message"></param>
-        /// <param name="queueDeclare"></param>
-        public void Send(string queue, string message, QueueDeclareModel queueDeclare = null)
+        public void Send<T>(string queue, T body, QueueDeclareModel queueDeclare = null)
         {
-            CreateChannel(queue, Encoding.UTF8.GetBytes(message), queueDeclare);
-        }
-        
-        public void Send(string queue, byte[] body, QueueDeclareModel queueDeclare = null)
-        {
-            CreateChannel(queue, body, queueDeclare);
+            CreateChannel(queue, BinaryData.FromObjectAsJson(body).ToArray(), queueDeclare);
         }
 
         /// <summary>

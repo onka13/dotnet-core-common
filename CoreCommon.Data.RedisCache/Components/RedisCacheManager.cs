@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CoreCommon.Infra.Helpers;
+using CoreCommon.Infrastructure.Helpers;
 using StackExchange.Redis;
 
 namespace CoreCommon.Data.RedisCache.Components

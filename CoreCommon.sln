@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.Infra", "CoreCommon.Infra\CoreCommon.Infra.csproj", "{25B11FAC-89CC-4341-9379-C9AF0E0D3AFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.Infrastructure", "CoreCommon.Infrastructure\CoreCommon.Infrastructure.csproj", "{25B11FAC-89CC-4341-9379-C9AF0E0D3AFA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.Data.EntityFrameworkBase", "CoreCommon.Data.EntityFrameworkBase\CoreCommon.Data.EntityFrameworkBase.csproj", "{83292A32-B168-4DEB-ACFB-6DFD6AE60346}"
 EndProject
@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.Data.ElasticSear
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.Business.Service", "CoreCommon.Business.Service\CoreCommon.Business.Service.csproj", "{6EC78679-EF8A-44FD-BF99-91D800746F61}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.Application.API", "CoreCommon.Application.API\CoreCommon.Application.API.csproj", "{58FA4D4E-658B-42CF-83C4-9597B2784B17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.Application.APIBase", "CoreCommon.Application.APIBase\CoreCommon.Application.APIBase.csproj", "{58FA4D4E-658B-42CF-83C4-9597B2784B17}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCommon.Data.RabbitMQ", "CoreCommon.Data.RabbitMQ\CoreCommon.Data.RabbitMQ.csproj", "{B97E6849-AB06-4E24-9039-E818242FA19C}"
 EndProject
