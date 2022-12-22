@@ -1,19 +1,25 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace CoreCommon.Data.Domain.Business
+namespace CoreCommon.Data.Domain.Business.Crud
 {
     /// <summary>
-    /// Repository base interface
+    /// Repository base interface.
     /// </summary>
-    /// <typeparam name="TEntity">Entity Type</typeparam>
+    /// <typeparam name="TEntity">Entity Type.</typeparam>
     public interface ICrudRepositoryBase<TEntity>
     {
-        IEnumerable<TEntity> GetAll();
-        TEntity Add(TEntity entity);
-        int Delete(TEntity entity);
-        int Edit(TEntity entity);
-        int BulkInsert(List<TEntity> entities);
-        int BulkUpdate(List<TEntity> entities);
-        int BulkDelete(List<TEntity> entities);
+        Task<TEntity> Add(TEntity entity);
+
+        Task<int> Delete(TEntity entity);
+
+        Task<int> Update(TEntity entity);
+
+        Task<int> BulkInsert(List<TEntity> entities);
+
+        Task<int> BulkUpdate(List<TEntity> entities);
+
+        Task<int> BulkDelete(List<TEntity> entities);
     }
 }

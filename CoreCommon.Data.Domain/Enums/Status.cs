@@ -3,7 +3,7 @@
 namespace CoreCommon.Data.Domain.Enums
 {
     /// <summary>
-    /// Status enum
+    /// Status enum.
     /// </summary>
     public enum Status : byte
     {
@@ -11,6 +11,6 @@ namespace CoreCommon.Data.Domain.Enums
         Active = 0,
 
         [Description("Passive")]
-        Passive = 1,        
+        Passive = 1,
     }
 }

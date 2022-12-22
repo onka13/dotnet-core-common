@@ -1,7 +1,5 @@
-﻿using CoreCommon.Data.EntityFrameworkBase.Base;
-using CoreCommon.Data.EntityFrameworkBase.Models;
+﻿using CoreCommon.Data.EntityFrameworkBase.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace CoreCommon.Data.EntityFrameworkBase.Components
 {

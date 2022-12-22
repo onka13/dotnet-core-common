@@ -1,4 +1,5 @@
 ﻿using CoreCommon.Data.Domain.Business;
+using CoreCommon.Data.Domain.Business.Crud;
 using System.Collections.Generic;
 
 namespace CoreCommon.Data.ElasticSearch.Base

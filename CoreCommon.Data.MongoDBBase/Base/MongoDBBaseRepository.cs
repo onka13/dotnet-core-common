@@ -1,13 +1,13 @@
 ﻿using CoreCommon.Data.Domain.Business;
-using CoreCommon.Data.Domain.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using MongoDB.Driver;
 using System.Linq;
-using Microsoft.Extensions.Configuration;
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
+using System.Threading.Tasks;
+using CoreCommon.Data.Domain.Business.Queryable;
+using CoreCommon.Data.Domain.Models;
 
 namespace CoreCommon.Data.MongoDBBase.Base
 {
@@ -34,71 +34,71 @@ namespace CoreCommon.Data.MongoDBBase.Base
             return Collection.AsQueryable();
         }
 
-        public IEnumerable<TDocument> GetAll()
+        public IQueryable<TDocument> GetAll()
         {
-            return Collection.Find(x => true).ToList();
+            return GetQueryable();
         }
 
-        public TDocument Add(TDocument entity)
+        public async Task<TDocument> Add(TDocument entity)
         {
-            Collection.InsertOne(entity);
+            await Collection.InsertOneAsync(entity);
             return entity;
         }
 
-        public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate)
+        public async Task<List<TDocument>> FindBy(Expression<Func<TDocument, bool>> predicate)
         {
-            return FindBy(predicate, false);
+            return await FindBy(predicate, false);
         }
 
-        public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate, bool includeRelations)
+        public async Task<List<TDocument>> FindBy(Expression<Func<TDocument, bool>> predicate, bool includeRelations)
         {
             if (!includeRelations)
-                return Collection.Find(predicate).ToList();
-            return GetRelationAggregate().Match(predicate).ToList();
+                return await Collection.Find(predicate).ToListAsync();
+            return await GetRelationAggregate().Match(predicate).ToListAsync();
         }
 
-        public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate, int skip, int take)
+        public async Task<List<TDocument>> FindBy(Expression<Func<TDocument, bool>> predicate, int skip, int take)
         {
-            return FindBy(predicate, skip, take, false);
+            return await FindBy(predicate, skip, take, false);
         }
 
-        public IEnumerable<TDocument> FindBy(Expression<Func<TDocument, bool>> predicate, int skip, int take, bool includeRelations)
-        {
-            if (!includeRelations)
-                return Collection.Find(predicate).Skip(skip).Limit(take).ToEnumerable();
-            return GetRelationAggregate().Match(predicate).Skip(skip).Limit(take).ToEnumerable();
-        }
-
-        public TDocument GetBy(Expression<Func<TDocument, bool>> predicate)
-        {
-            return GetBy(predicate, false);
-        }
-
-        public TDocument GetBy(Expression<Func<TDocument, bool>> predicate, bool includeRelations)
+        public async Task<List<TDocument>> FindBy(Expression<Func<TDocument, bool>> predicate, int skip, int take, bool includeRelations)
         {
             if (!includeRelations)
-                return Collection.Find(predicate).FirstOrDefault();
-            return GetRelationAggregate().Match(predicate).FirstOrDefault();
+                return await Collection.Find(predicate).Skip(skip).Limit(take).ToListAsync();
+            return await GetRelationAggregate().Match(predicate).Skip(skip).Limit(take).ToListAsync();
         }
 
-        public int Delete(TDocument entity)
+        public async Task<TDocument> GetBy(Expression<Func<TDocument, bool>> predicate)
         {
-            return DeleteBy(entity.PrimaryPredicate());
+            return await GetBy(predicate, false);
         }
 
-        public int DeleteBy(Expression<Func<TDocument, bool>> predicate)
+        public async Task<TDocument> GetBy(Expression<Func<TDocument, bool>> predicate, bool includeRelations)
         {
-            var result = Collection.DeleteOne(predicate);
+            if (!includeRelations)
+                return await Collection.Find(predicate).FirstOrDefaultAsync();
+            return await GetRelationAggregate().Match(predicate).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> Delete(TDocument entity)
+        {
+            return await DeleteBy(entity.PrimaryPredicate());
+        }
+
+        public async Task<int> DeleteBy(Expression<Func<TDocument, bool>> predicate)
+        {
+            var result = await Collection.DeleteOneAsync(predicate);
             return result.IsAcknowledged ? (int)result.DeletedCount : 0;
         }
 
-        public int Edit(TDocument entity)
+        public async Task<int> Update(TDocument entity)
         {
-            var result = Collection.ReplaceOne(entity.PrimaryPredicate(), entity);
+            var result = await Collection.ReplaceOneAsync(entity.PrimaryPredicate(), entity);
             return result.IsAcknowledged ? (int)result.MatchedCount : 0;
         }
 
-        public int EditOnly(TDocument entity, params Expression<Func<TDocument, object>>[] properties)
+        public async Task<int> UpdateOnly(TDocument entity, params Expression<Func<TDocument, object>>[] properties)
         {
             //var filter = Builders<TDocument>.Filter.In(x => x.PrimaryPredicate, entities.Select(x => x.PrimaryPredicate));
             //var update = Builders<Profile>.Update.Set(x => x.IsDeleted, true);
@@ -111,36 +111,36 @@ namespace CoreCommon.Data.MongoDBBase.Base
             {
                 def = def.Set(properties[i], properties[i].Compile().Invoke(entity));
             }
-            var result = Collection.UpdateOne(entity.PrimaryPredicate(), def);
+            var result = await Collection.UpdateOneAsync(entity.PrimaryPredicate(), def);
             return result.IsAcknowledged ? (int)result.MatchedCount : 0;
         }
 
-        public int BulkInsert(List<TDocument> entities)
+        public async Task<int> BulkInsert(List<TDocument> entities)
         {
             if (entities.Count == 0) return 0;
-            var res = Collection.BulkWrite(entities.Select(x => new InsertOneModel<TDocument>(x)));
+            var res = await Collection.BulkWriteAsync(entities.Select(x => new InsertOneModel<TDocument>(x)));
             return (int)res.InsertedCount;
         }
 
-        public int BulkUpdate(List<TDocument> entities)
+        public async Task<int> BulkUpdate(List<TDocument> entities)
         {
             if (entities.Count == 0) return 0;
-            var res = Collection.BulkWrite(entities.Select(x => new ReplaceOneModel<TDocument>(x.PrimaryPredicate(), x) { IsUpsert = true }));
+            var res = await Collection.BulkWriteAsync(entities.Select(x => new ReplaceOneModel<TDocument>(x.PrimaryPredicate(), x) { IsUpsert = true }));
             return (int)res.ModifiedCount;
         }
 
-        public int BulkDelete(List<TDocument> entities)
+        public async Task<int> BulkDelete(List<TDocument> entities)
         {
             if (entities.Count == 0) return 0;
-            var res = Collection.BulkWrite(entities.Select(x => new DeleteOneModel<TDocument>(x.PrimaryPredicate())));
+            var res = await Collection.BulkWriteAsync(entities.Select(x => new DeleteOneModel<TDocument>(x.PrimaryPredicate())));
             return (int)res.DeletedCount;
         }
 
-        public int BulkUpdateOnly(List<TDocument> entities, params Expression<Func<TDocument, object>>[] properties)
+        public async Task<int> BulkUpdateOnly(List<TDocument> entities, params Expression<Func<TDocument, object>>[] properties)
         {
             if (properties.Length == 0 || entities.Count == 0) return 0;
 
-            var res = Collection.BulkWrite(entities.Select(entity =>
+            var res = await Collection.BulkWriteAsync(entities.Select(entity =>
             {
                 var def = new UpdateDefinitionBuilder<TDocument>().Set(properties[0], properties[0].Compile().Invoke(entity));
                 for (int i = 1; i < properties.Length; i++)
@@ -174,7 +174,7 @@ namespace CoreCommon.Data.MongoDBBase.Base
             return res.Match(predicate).ToEnumerable();
         }
 
-        public List<dynamic> RawJsonQuery<T>(string json)
+        public async Task<List<dynamic>> RawJsonQuery<T>(string json)
         {
             //var query = BsonSerializer.Deserialize<List<BsonDocument>>(json);
             //var res = Collection.Aggregate<BsonDocument>(query).ToList();
@@ -184,29 +184,30 @@ namespace CoreCommon.Data.MongoDBBase.Base
                 doc
             };
 
-            var res0 = DbContext.GetCollection<T>().Aggregate(pipeline).ToList();
+            var res0 = await DbContext.GetCollection<T>().Aggregate(pipeline).ToListAsync();
 
             return res0;
         }
 
-        public List<object> SkipTake<T>(IAggregateFluent<T> result, int skip, int take, out long total)
+        public async Task<SearchResult> SkipTake<T>(IAggregateFluent<T> query, int skip, int take)
         {
+            var result = new SearchResult();
             if (take > 0)
             {
                 //var sortStage = result.Stages.FirstOrDefault(x => x.OperatorName == "$sort");
                 //var stages = result.Stages.Where(x => x.OperatorName != "$sort");                
                 //var resultForTotal = new PipelineStagePipelineDefinition<TDocument, T>(stages);
-                
-                total = result.Count().FirstOrDefault()?.Count ?? 0;
-                result = result.Skip(skip).Limit(take);
+
+                result.Total = query.Count().FirstOrDefault()?.Count ?? 0;
+                query = query.Skip(skip).Limit(take);
             }
             else
             {
-                total = 0;
+                result.Total = 0;
             }
-            var list = result.ToList();
 
-            return list.Cast<object>().ToList();
+            result.Items = (await query.ToListAsync()).Cast<object>().ToList();
+            return result;
         }
 
         protected AggregateUnwindOptions<T> GetAggregateUnwindOptions<T>()
@@ -217,7 +218,17 @@ namespace CoreCommon.Data.MongoDBBase.Base
             };
         }
 
-        public int EditExcept(TDocument entity, params Expression<Func<TDocument, object>>[] exclude)
+        public async Task<bool> Exists(Expression<Func<TDocument, bool>> predicate)
+        {
+            return await Any(predicate);
+        }
+        
+        public async Task<bool> Any(Expression<Func<TDocument, bool>> predicate)
+        {
+            return await Collection.Find(predicate).AnyAsync();
+        }
+
+        Task<int> IQueryableRepositoryBase<TDocument>.UpdateExcept(TDocument entity, params Expression<Func<TDocument, object>>[] exclude)
         {
             throw new NotImplementedException();
         }

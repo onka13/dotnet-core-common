@@ -9,27 +9,31 @@ namespace CoreCommon.Data.Domain.Models
 
     public class ApiRequestListModel<T>
     {
-        public Pagination Pagination { get; set; }
-        public Sort Sort { get; set; }
-        public T Filter { get; set; }
-
         public ApiRequestListModel()
         {
             Pagination = new Pagination { Page = 1, PerPage = 30 };
             Sort = new Sort();
-            Filter = default(T);
+            Filter = default;
         }
+
+        public Pagination Pagination { get; set; }
+
+        public Sort Sort { get; set; }
+
+        public T Filter { get; set; }
     }
 
     public class Pagination
     {
         public int Page { get; set; }
+
         public int PerPage { get; set; }
     }
 
     public class Sort
     {
         public string Field { get; set; }
+
         public string Order { get; set; }
     }
 
