@@ -3,6 +3,7 @@ using Amazon.S3;
 using Amazon.S3.Transfer;
 using CoreCommon.AmazonBusiness.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
@@ -55,6 +56,10 @@ public class AmazonS3Manager
             Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
             throw e;
         }
-        return false;
+    }
+
+    public Task<Stream> GetObjectStreamByKey(string bucketName, string keyName)
+    {
+        return s3Client.GetObjectStreamAsync(bucketName, keyName, new Dictionary<string, object>());
     }
 }
