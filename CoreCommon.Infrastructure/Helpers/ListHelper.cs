@@ -23,7 +23,7 @@ namespace CoreCommon.Infrastructure.Helpers
 
         public static void Shufflev2<T>(this IList<T> list)
         {
-            var provider = new RNGCryptoServiceProvider();
+            var provider = RandomNumberGenerator.Create();
             int n = list.Count;
             while (n > 1)
             {
