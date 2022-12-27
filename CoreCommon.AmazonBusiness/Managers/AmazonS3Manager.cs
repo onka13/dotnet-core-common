@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace CoreCommon.AmazonBusiness.helpers
 {
@@ -55,7 +56,11 @@ namespace CoreCommon.AmazonBusiness.helpers
                 Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
                 throw e;
             }
-            return false;
+        }
+
+        public Task<Stream> GetObjectStreamByKey(string bucketName, string keyName)
+        {
+            return s3Client.GetObjectStreamAsync(bucketName, keyName, new Dictionary<string, object>());
         }
     }
 }
