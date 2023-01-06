@@ -11,7 +11,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 	<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
 	<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.3.0" />
-	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="6.3.0" />
+	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="6.4.0" />
 	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.3.0" />
 	<PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
 	<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.3" />
