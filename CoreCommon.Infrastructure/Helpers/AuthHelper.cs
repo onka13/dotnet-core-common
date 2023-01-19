@@ -226,6 +226,10 @@ namespace CoreCommon.Infrastructure.Helpers
             {
                 isExpired = true;
             }
+            catch
+            {
+                // ignored
+            }
 
             return default;
         }
