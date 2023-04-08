@@ -167,7 +167,7 @@ namespace CoreCommon.Infrastructure.Helpers
 
         public static Dictionary<string, string> ConvertToDictionary<T>(T model)
         {
-            return model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).ToDictionary(prop => prop.Name, prop => (string)prop.GetValue(model, null));
+            return model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).ToDictionary(prop => prop.Name, prop => prop.GetValue(model, null)?.ToString());
         }
     }
 }
