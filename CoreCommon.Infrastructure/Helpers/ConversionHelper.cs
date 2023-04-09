@@ -167,7 +167,30 @@ namespace CoreCommon.Infrastructure.Helpers
 
         public static Dictionary<string, string> ConvertToDictionary<T>(T model)
         {
-            return model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).ToDictionary(prop => prop.Name, prop => (string)prop.GetValue(model, null));
+            ArgumentNullException.ThrowIfNull("model");
+            return model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).ToDictionary(prop => prop.Name, prop => prop.GetValue(model, null)?.ToString());
+        }
+
+        public static Dictionary<string, string> ConvertItemsToDictionary(params object[] models)
+        {
+            if (models == null || models.Length == 0)
+            {
+                throw new ArgumentException("No items passed to convert!");
+            }
+
+            var response = ConvertToDictionary(models[0]);
+
+            for (int i = 1; i < models.Length; i++)
+            {
+                if (models[i] == null)
+                {
+                    continue;
+                }
+
+                ConvertToDictionary(models[i]).ToList().ForEach(x => response[x.Key] = x.Value);
+            }
+
+            return response;
         }
     }
 }
