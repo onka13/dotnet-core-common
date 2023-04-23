@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using CoreCommon.Infrastructure.Converters;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CoreCommon.Infrastructure.Helpers
 {
@@ -165,20 +170,54 @@ namespace CoreCommon.Infrastructure.Helpers
             }
         }
 
-        public static Dictionary<string, string> ConvertToDictionary<T>(T model)
+        public static Dictionary<string, string> ConvertToFlatDictionary<T>(T model, string prefix = "")
         {
             ArgumentNullException.ThrowIfNull("model");
-            return model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).ToDictionary(prop => prop.Name, prop => prop.GetValue(model, null)?.ToString());
+            var dic = new Dictionary<string, string>();
+            ConvertToDictionaryInternal(model, dic, prefix);
+            return dic;
+        }
+        
+        private static void ConvertToDictionaryInternal<T>(T value, Dictionary<string, string> dic, string prefix = "")
+        {
+            var type = value?.GetType();
+
+            if (type == null || type.IsValueType || type == typeof(string))
+            {
+                dic.Add(prefix, value?.ToString());
+                return;
+            }
+
+            if (value is IEnumerable enumerable)
+            {
+                var counter = 0;
+                foreach (var item in enumerable)
+                {
+                    counter++;
+                    ConvertToDictionaryInternal(item, dic, $"{prefix}[{counter}]");
+                }
+                return;
+            }
+
+            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(x => x.CanRead);
+            if (prefix != "")
+            {
+                prefix += ".";
+            }
+            foreach (var property in properties)
+            {
+                ConvertToDictionaryInternal(property.GetValue(value, null), dic, $"{prefix}{property.Name}");
+            }
         }
 
-        public static Dictionary<string, string> ConvertItemsToDictionary(params object[] models)
+        public static Dictionary<string, string> ConvertItemsToFlatDictionary(params object[] models)
         {
             if (models == null || models.Length == 0)
             {
                 throw new ArgumentException("No items passed to convert!");
             }
 
-            var response = ConvertToDictionary(models[0]);
+            var response = ConvertToFlatDictionary(models[0]);
 
             for (int i = 1; i < models.Length; i++)
             {
@@ -187,7 +226,7 @@ namespace CoreCommon.Infrastructure.Helpers
                     continue;
                 }
 
-                ConvertToDictionary(models[i]).ToList().ForEach(x => response[x.Key] = x.Value);
+                ConvertToFlatDictionary(models[i]).ToList().ForEach(x => response[x.Key] = x.Value);
             }
 
             return response;
