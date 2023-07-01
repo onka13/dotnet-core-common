@@ -21,43 +21,43 @@ namespace CoreCommon.ModuleBase.Filters
             //    actionContext.Result = new BadRequestObjectResult(ServiceResult<string>.Instance.ErrorResult(ServiceResultCode.EmptyModel, "Empty Model"));
             //    return;
             //}
-            //if (!actionContext.ModelState.IsValid)
-            //{
-            //    var methodIgnoreAllAttribute = (actionContext.ActionDescriptor as ControllerActionDescriptor).MethodInfo.GetCustomAttributes(false).OfType<ModelStateIgnoreAllAttribute>().FirstOrDefault();
-            //    if (methodIgnoreAllAttribute != null)
-            //    {
-            //        actionContext.ModelState.Clear();
-            //        return;
-            //    }
-            //    var methodIgnoreAttribute = (actionContext.ActionDescriptor as ControllerActionDescriptor).MethodInfo.GetCustomAttributes(false).OfType<ModelStateIgnoreAttribute>().FirstOrDefault();                
-            //    var methodFieldsAttribute = (actionContext.ActionDescriptor as ControllerActionDescriptor).MethodInfo.GetCustomAttributes(false).OfType<ModelStateFieldsAttribute>().FirstOrDefault();
+            if (!actionContext.ModelState.IsValid)
+            {
+                var methodIgnoreAllAttribute = (actionContext.ActionDescriptor as ControllerActionDescriptor).MethodInfo.GetCustomAttributes(false).OfType<ModelStateIgnoreAllAttribute>().FirstOrDefault();
+                if (methodIgnoreAllAttribute != null)
+                {
+                    actionContext.ModelState.Clear();
+                    return;
+                }
+                var methodIgnoreAttribute = (actionContext.ActionDescriptor as ControllerActionDescriptor).MethodInfo.GetCustomAttributes(false).OfType<ModelStateIgnoreAttribute>().FirstOrDefault();
+                var methodFieldsAttribute = (actionContext.ActionDescriptor as ControllerActionDescriptor).MethodInfo.GetCustomAttributes(false).OfType<ModelStateFieldsAttribute>().FirstOrDefault();
 
-            //    string msg = "Invalid Model";
-            //    foreach (var item in actionContext.ModelState.Where(x => x.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
-            //    {
-            //        if (methodIgnoreAttribute != null && methodIgnoreAttribute.Names.Contains(item.Key))
-            //        {
-            //            actionContext.ModelState.Remove(item.Key);
-            //            continue;
-            //        }
-            //        if (methodFieldsAttribute != null && !methodFieldsAttribute.Names.Contains(item.Key))
-            //        {
-            //            actionContext.ModelState.Remove(item.Key);
-            //            continue;
-            //        }
-            //        msg += "\n" + item.Key;
-            //        foreach (var err in item.Value.Errors)
-            //        {
-            //            msg += "\n" + err.ErrorMessage;
-            //            if (err.Exception != null) msg += "exception: " + err.Exception.Message;
-            //        }
-            //    }
-            //    if (actionContext.ModelState.Count > 0)
-            //    {
-            //        actionContext.Result = new BadRequestObjectResult(ServiceResult<string>.Instance.ErrorResult(ServiceResultCode.InvalidModel, msg));
-            //    }                
-            //    return;
-            //}
+                string msg = "Invalid Model";
+                foreach (var item in actionContext.ModelState.Where(x => x.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                {
+                    if (methodIgnoreAttribute != null && methodIgnoreAttribute.Names.Contains(item.Key))
+                    {
+                        actionContext.ModelState.Remove(item.Key);
+                        continue;
+                    }
+                    if (methodFieldsAttribute != null && !methodFieldsAttribute.Names.Contains(item.Key))
+                    {
+                        actionContext.ModelState.Remove(item.Key);
+                        continue;
+                    }
+                    msg += "\n" + item.Key;
+                    foreach (var err in item.Value.Errors)
+                    {
+                        msg += "\n" + err.ErrorMessage;
+                        if (err.Exception != null) msg += "exception: " + err.Exception.Message;
+                    }
+                }
+                if (actionContext.ModelState.Count > 0)
+                {
+                    actionContext.Result = new BadRequestObjectResult(ServiceResult<string>.Instance.ErrorResult(ServiceResultCode.InvalidModel, msg));
+                }
+                return;
+            }
         }
     }
 }
