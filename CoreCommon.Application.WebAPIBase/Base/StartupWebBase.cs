@@ -8,6 +8,7 @@ using CoreCommon.Application.WebAPIBase.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
@@ -163,6 +164,11 @@ namespace CoreCommon.Application.WebAPIBase.Base
 #else
                 o.SerializerSettings.Formatting = Formatting.None;
 #endif
+            });
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
             });
         }
 
