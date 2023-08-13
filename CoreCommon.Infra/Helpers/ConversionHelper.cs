@@ -42,7 +42,7 @@ namespace CoreCommon.Infrastructure.Helpers
         /// <param name="culture"></param>
         /// <param name="isCamelCase"></param>
         /// <returns></returns>
-        public static string Serialize(object obj, CultureInfo culture = null, bool isCamelCase = false, bool isIndented = false)
+        public static string Serialize(object obj, CultureInfo culture = null, bool isCamelCase = false, bool isIndented = false, bool minimise = false)
         {
             var writer = new StringWriter();
             JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings { Culture = culture, Formatting = isIndented ? Formatting.Indented : Formatting.None });
@@ -53,6 +53,12 @@ namespace CoreCommon.Infrastructure.Helpers
             serializer.Converters.Add(new FormattedDecimalConverter(culture));
             serializer.Converters.Add(new DateTimeConverter());
             serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            if (minimise)
+            {
+                serializer.DefaultValueHandling = DefaultValueHandling.Ignore;
+                serializer.NullValueHandling = NullValueHandling.Ignore;
+            }
+
             serializer.Serialize(writer, obj);
             return writer.ToString();
         }
@@ -72,6 +78,7 @@ namespace CoreCommon.Infrastructure.Helpers
             serializer.Converters.Add(new FormattedDecimalConverter(culture));
             serializer.Converters.Add(new DateTimeConverter());
             serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            serializer.DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate;
             return serializer.Deserialize<T>(reader);
         }
 
