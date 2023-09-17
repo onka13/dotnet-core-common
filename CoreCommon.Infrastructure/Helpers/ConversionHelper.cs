@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using CoreCommon.Infrastructure.Converters;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
@@ -230,6 +231,11 @@ namespace CoreCommon.Infrastructure.Helpers
             }
 
             return response;
+        }
+
+        public static string ToBase64(string text)
+        {
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
         }
     }
 }
