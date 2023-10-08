@@ -25,7 +25,14 @@ namespace CoreCommon.ModuleBase.Components
 
         protected string GetIpAddress()
         {
-            return (HttpContextAccessor?.HttpContext ?? HttpContext).Connection.RemoteIpAddress.MapToIPv4().ToString();
+            var context = HttpContextAccessor?.HttpContext ?? HttpContext;
+            var ip = GetFromHeader("X-Forwarded-For");
+            if (ip != null)
+            {
+                return ip.Split(new char[] { ':', ',' }).FirstOrDefault();
+            }
+
+            return context.Connection.RemoteIpAddress.MapToIPv4().ToString();
         }
 
         protected string GetFromHeader(string headerName)
