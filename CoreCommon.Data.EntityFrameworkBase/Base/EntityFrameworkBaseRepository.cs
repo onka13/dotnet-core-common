@@ -311,11 +311,6 @@ namespace CoreCommon.Data.EntityFrameworkBase.Base
         /// </summary>
         public virtual IQueryable<TEntity> ExecuteQuery(string query, params object[] parameters)
         {
-            if (GetDbContext().Database.IsCosmos())
-            {
-                return CosmosQueryableExtensions.FromSqlRaw(GetDbSet(), query, parameters);
-            }
-
             return RelationalQueryableExtensions.FromSqlRaw(GetDbSet(), query, parameters);
         }
 

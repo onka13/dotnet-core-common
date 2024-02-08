@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.EntityFrameworkCore;
@@ -118,7 +119,12 @@ namespace CoreCommon.Data.EntityFrameworkBase.Managers
 
             var context = initializedDbContexts[key];
 
-            context.ChangeTracker.Clear();
+            var undetachedEntriesCopy = context.ChangeTracker.Entries()
+                .Where(e => e.State != EntityState.Detached)
+                .ToList();
+
+            foreach (var entry in undetachedEntriesCopy)
+                entry.State = EntityState.Detached;
             await context.DisposeAsync();
             initializedDbContexts.Remove(key);
         }

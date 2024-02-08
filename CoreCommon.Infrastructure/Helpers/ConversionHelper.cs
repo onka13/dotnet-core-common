@@ -109,6 +109,12 @@ namespace CoreCommon.Infrastructure.Helpers
             return JsonConvert.DeserializeObject(value, type);
         }
 
+        public static T JsonClone<T>(this T obj)
+        {
+            var deserializeSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj), deserializeSettings);
+        }
+
         /// <summary>
         /// Clones an object with using JSON deserizalitaion and serialization.
         /// </summary>

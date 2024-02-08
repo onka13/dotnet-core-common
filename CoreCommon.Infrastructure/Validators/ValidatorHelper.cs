@@ -25,23 +25,5 @@ namespace CoreCommon.Infrastructure.Validators
 
             return null;
         }
-
-        public static List<ValidationResult> IsValid<T>(this List<T> items, [CallerArgumentExpression("items")] string itemsName = "")
-        {
-            var results = new List<ValidationResult>();
-            if (items != null)
-            {
-                for (int i = 0; i < items.Count; i++)
-                {
-                    var result = items[i].IsValid($"{itemsName}[{i}]");
-                    if (result != null)
-                    {
-                        results.AddRange(result);
-                    }
-                }
-            }
-
-            return results;
-        }
     }
 }

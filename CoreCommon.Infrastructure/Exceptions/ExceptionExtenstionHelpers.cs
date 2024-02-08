@@ -8,7 +8,7 @@ namespace CoreCommon.Infrastructure.Exceptions
     {
         public static LogLevel GetLogLevel(this Exception ex)
         {
-            if (ex is not AppException)
+            if (!(ex is AppException))
             {
                 return LogLevel.Error;
             }
