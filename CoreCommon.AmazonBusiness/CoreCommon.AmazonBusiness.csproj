@@ -1,18 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.7.1.15" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.1.15" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.5.0" />
+    <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.7.5.9" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.9.43" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.22.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CoreCommon.Data.Domain\CoreCommon.Data.Domain.csproj" />
-    <ProjectReference Include="..\CoreCommon.Infra\CoreCommon.Infra.csproj" />
   </ItemGroup>
 
 </Project>

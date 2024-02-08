@@ -3,17 +3,13 @@
 namespace CoreCommon.Data.EntityFrameworkBase.Components
 {
     /// <summary>
-    /// A simple Db Context
+    /// A simple Db Context.
     /// </summary>
     public class EmptyDbContext : DbContextBase
     {
-        public override string Name { get => _name; }
-        private string _name;
+        private string name;
 
-        public void SetName(string name)
-        {
-            _name = name;
-        }
+        public override string Name { get => name; }
 
         public static EmptyDbContext Init(string provider, string connectionString)
         {
@@ -21,6 +17,11 @@ namespace CoreCommon.Data.EntityFrameworkBase.Components
             context.Provider = provider;
             context.ConnectionString = connectionString;
             return context;
+        }
+
+        public void SetName(string name)
+        {
+            this.name = name;
         }
     }
 }

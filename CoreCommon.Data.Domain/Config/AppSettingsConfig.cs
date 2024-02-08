@@ -8,5 +8,7 @@ namespace CoreCommon.Data.Domain.Config
     public class AppSettingsConfig
     {
         public List<string> TestEmailReceivers { get; set; }
+
+        public string Url { get; set; }
     }
 }

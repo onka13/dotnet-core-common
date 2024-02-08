@@ -1,7 +1,7 @@
-﻿using CoreCommon.Infra.Helpers;
-using MongoDB.Bson.Serialization;
+﻿using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
 using System;
+using CoreCommon.Infrastructure.Helpers;
 
 namespace CoreCommon.Data.MongoDBBase.Serializers
 {

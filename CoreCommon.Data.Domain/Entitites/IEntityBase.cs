@@ -1,7 +1,7 @@
 ﻿namespace CoreCommon.Data.Domain.Entities
 {
     /// <summary>
-    /// Base entity interface
+    /// Base entity interface.
     /// </summary>
     public interface IEntityBase
     {

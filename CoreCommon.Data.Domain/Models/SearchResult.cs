@@ -6,6 +6,6 @@ namespace CoreCommon.Data.Domain.Models
     {
         public List<object> Items { get; set; }
 
-        public int Total { get; set; }
+        public long Total { get; set; }
     }
 }

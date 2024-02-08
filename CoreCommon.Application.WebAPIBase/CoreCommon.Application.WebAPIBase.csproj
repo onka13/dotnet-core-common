@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.4.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+	<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.3.0" />
+	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="6.3.0" />
+	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.3.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoreCommon.Application.APIBase\CoreCommon.Application.APIBase.csproj" />
+  </ItemGroup>
+
+</Project>

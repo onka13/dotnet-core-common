@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Autofac;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CoreCommon.Data.EntityFrameworkBase.Managers
 {
@@ -13,25 +12,95 @@ namespace CoreCommon.Data.EntityFrameworkBase.Managers
     public class DbContextManager
     {
         /// <summary>
-        /// Autofac component to resolve dependencies
+        /// Contains dbcontexts.
+        /// </summary>
+        private Dictionary<string, DbContext> initializedDbContexts;
+
+        /// <summary>
+        /// Contains transactions.
+        /// </summary>
+        private Dictionary<string, IDbContextTransaction> transactions;
+
+        public DbContextManager(IComponentContext componentContext)
+        {
+            ComponentContext = componentContext;
+            System.Diagnostics.Debug.WriteLine("XXX DbContextManager Constructor");
+            initializedDbContexts = new Dictionary<string, DbContext>();
+            transactions = new Dictionary<string, IDbContextTransaction>();
+        }
+
+        /// <summary>
+        /// Autofac component to resolve dependencies.
         /// </summary>
         public IComponentContext ComponentContext { get; set; }
 
-        /// <summary>
-        /// Contains dbcontexts
-        /// </summary>
-        private Dictionary<string, DbContext> _initializedDbContexts;
-
-        /// <summary>
-        /// Contains transactions
-        /// </summary>
-        private Dictionary<string, IDbContextTransaction> _transactions;
-
-        public DbContextManager()
+        public DbContext GetDbContext<T>(string refId)
+            where T : DbContext
         {
-            System.Diagnostics.Debug.WriteLine("XXX DbContextManager Constructor");
-            _initializedDbContexts = new Dictionary<string, DbContext>();
-            _transactions = new Dictionary<string, IDbContextTransaction>();
+            var key = GetKey<T>(refId);
+            if (!initializedDbContexts.ContainsKey(key))
+            {
+                System.Diagnostics.Debug.WriteLine("XXX DbContextManager resolved " + refId + " " + typeof(T).Name);
+                var dbContext = ComponentContext.Resolve<T>();
+                dbContext.ChangeTracker.LazyLoadingEnabled = false;
+                dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                initializedDbContexts.Add(key, dbContext);
+            }
+
+            return initializedDbContexts[key];
+        }
+
+        public virtual async Task<int> Save<T>(string refId)
+            where T : DbContext
+        {
+            try
+            {
+                var res = await GetDbContext<T>(refId).SaveChangesAsync();
+                if (!HasTransaction<T>(refId))
+                {
+                    await RemoveDbContext<T>(refId);
+                }
+
+                return res;
+            }
+            catch
+            {
+                await RemoveDbContext<T>(refId);
+                throw;
+            }
+        }
+
+        public bool HasTransaction<T>(string refId)
+        {
+            return transactions.ContainsKey(GetKey<T>(refId));
+        }
+
+        public async Task BeginTransaction<T>(string refId)
+            where T : DbContext
+        {
+            var key = GetKey<T>(refId);
+            var transaction = await GetDbContext<T>(refId).Database.BeginTransactionAsync();
+            transactions.Add(key, transaction);
+        }
+
+        public async Task CommitTransaction<T>(string refId)
+            where T : DbContext
+        {
+            var key = GetKey<T>(refId);
+            await transactions[key].CommitAsync();
+            transactions[key].Dispose();
+            transactions.Remove(key);
+            await RemoveDbContext<T>(refId);
+        }
+
+        public async Task RollbackTransaction<T>(string refId)
+            where T : DbContext
+        {
+            var key = GetKey<T>(refId);
+            await transactions[key].RollbackAsync();
+            transactions[key].Dispose();
+            transactions.Remove(key);
+            await RemoveDbContext<T>(refId);
         }
 
         private string GetKey<T>(string refId)
@@ -39,67 +108,19 @@ namespace CoreCommon.Data.EntityFrameworkBase.Managers
             return typeof(T).FullName + "." + refId;
         }
 
-        public DbContext GetDbContext<T>(string refId) where T : DbContext
+        private async Task RemoveDbContext<T>(string refId)
         {
             var key = GetKey<T>(refId);
-            if (!_initializedDbContexts.ContainsKey(key))
+            if (initializedDbContexts[key] == null)
             {
-                System.Diagnostics.Debug.WriteLine("XXX DbContextManager resolved " + refId + " " + typeof(T).Name);
-                var dbContext = ComponentContext.Resolve<T>();
-                dbContext.ChangeTracker.LazyLoadingEnabled = false;
-                dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-                _initializedDbContexts.Add(key, dbContext);
+                return;
             }
-            return _initializedDbContexts[key];
-        }
 
-        private void RemoveDbContext<T>(string refId)
-        {
-            var key = GetKey<T>(refId);
-            _initializedDbContexts.Remove(key);
-        }
+            var context = initializedDbContexts[key];
 
-        public int Save<T>(string refId) where T : DbContext
-        {
-            var res = GetDbContext<T>(refId).SaveChanges();
-            if (!HasTransaction<T>(refId))
-            {
-                GetDbContext<T>(refId).Dispose();
-                RemoveDbContext<T>(refId);
-            }
-            return res;
-        }
-
-        public bool HasTransaction<T>(string refId)
-        {
-            return _transactions.ContainsKey(GetKey<T>(refId));
-        }
-
-        public void BeginTransaction<T>(string refId) where T : DbContext
-        {
-            var key = GetKey<T>(refId);
-            var transaction = GetDbContext<T>(refId).Database.BeginTransaction();
-            _transactions.Add(key, transaction);
-        }
-
-        public void CommitTransaction<T>(string refId) where T : DbContext
-        {
-            var key = GetKey<T>(refId);
-            _transactions[key].Commit();
-            _transactions[key].Dispose();
-            _transactions.Remove(key);
-            GetDbContext<T>(refId).Dispose();
-            RemoveDbContext<T>(refId);
-        }
-
-        public void RollbackTransaction<T>(string refId) where T : DbContext
-        {
-            var key = GetKey<T>(refId);
-            _transactions[key].Rollback();
-            _transactions[key].Dispose();
-            _transactions.Remove(key);
-            GetDbContext<T>(refId).Dispose();
-            RemoveDbContext<T>(refId);
+            context.ChangeTracker.Clear();
+            await context.DisposeAsync();
+            initializedDbContexts.Remove(key);
         }
     }
 }

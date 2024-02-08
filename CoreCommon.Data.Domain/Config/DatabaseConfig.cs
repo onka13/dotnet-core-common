@@ -3,9 +3,11 @@
     public class DatabaseConfig
     {
         public string ConnectionString { get; set; }
+
         public string DatabaseName { get; set; }
+
         /// <summary>
-        /// mssql, mysql, postgresql
+        /// Gets or sets Provider (mssql, mysql, postgresql).
         /// </summary>
         public string Provider { get; set; }
     }

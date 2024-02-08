@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,14 +20,12 @@ namespace CoreCommon.ModuleBase.Components
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var stateFilter = new ModelStateFilter();
-            stateFilter.OnActionExecuting(context);
-            //base.OnActionExecuting(context);
+            base.OnActionExecuting(context);
         }
 
         protected string GetIpAddress()
         {
-            return HttpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            return (HttpContextAccessor?.HttpContext ?? HttpContext).Connection.RemoteIpAddress.MapToIPv4().ToString();
         }
 
         protected string GetFromHeader(string headerName)
@@ -40,6 +36,16 @@ namespace CoreCommon.ModuleBase.Components
                 return values.ToArray().ToList().FirstOrDefault();
             }
             return null;
+        }
+
+        public override JsonResult Json(object data)
+        {
+            if (data.GetType().GetInterface(nameof(IServiceResult)) == null)
+            {
+                return base.Json(ServiceResult<object>.Instance.SuccessResult(data));
+            }
+
+            return base.Json(data);
         }
 
         protected IActionResult SuccessResponse(object msg = null, int resultCode = 0)
@@ -63,6 +69,12 @@ namespace CoreCommon.ModuleBase.Components
         protected IActionResult ResponseNextPage<T>(List<T> result, int take)
         {
             var response = ServiceListMoreResult<T>.Instance.SuccessResult(result, take);
+            return Json(response);
+        }
+
+        protected IActionResult SuccessListResponse(List<object> resultValue, long total)
+        {
+            var response = ServiceListResult<object>.Instance.SuccessResult(resultValue, total);
             return Json(response);
         }
 

@@ -4,39 +4,40 @@ using System.Collections.Generic;
 namespace CoreCommon.Data.Domain.Business
 {
     /// <summary>
-    /// Service result interface
+    /// Service result interface.
     /// </summary>
     public interface IServiceResult
     {
         bool Success { get; }
+
         int Code { get; set; }
     }
 
     /// <summary>
     /// Service result model which includes paging prev and next functionality.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">Model.</typeparam>
     public class ServiceListMoreResult<T> : ServiceResult<List<T>>
     {
         /// <summary>
-        /// If resultset has next page.
+        /// Gets an instance for ServiceListMoreResult.
         /// </summary>
-        public bool HasMore { get; set; }
-
-        /// <summary>
-        /// Creates an instance
-        /// </summary>
-        public new static ServiceListMoreResult<T> Instance
+        public static new ServiceListMoreResult<T> Instance
         {
             get { return new ServiceListMoreResult<T>(); }
         }
 
         /// <summary>
-        /// Returns success result
+        /// Gets or sets a value indicating whether HasMore.
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
+        public bool HasMore { get; set; }
+
+        /// <summary>
+        /// Returns success result.
+        /// </summary>
+        /// <param name="value">Value.</param>
+        /// <param name="take">Limit.</param>
+        /// <returns><see cref="ServiceListMoreResult{T}"/>.</returns>
         public new ServiceListMoreResult<T> SuccessResult(List<T> value, int take)
         {
             HasMore = false;
@@ -45,6 +46,7 @@ namespace CoreCommon.Data.Domain.Business
                 value.RemoveAt(take);
                 HasMore = true;
             }
+
             base.SuccessResult(value, 0);
             return this;
         }
@@ -53,28 +55,28 @@ namespace CoreCommon.Data.Domain.Business
     /// <summary>
     /// Service result model which includes count value of the resultset for paging.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">Model.</typeparam>
     public class ServiceListResult<T> : ServiceResult<List<T>>
     {
         /// <summary>
-        /// Total count of results.
+        /// Gets an instance for ServiceListResult.
         /// </summary>
-        public long Total { get; set; }
-
-        /// <summary>
-        /// Creates an instance
-        /// </summary>
-        public new static ServiceListResult<T> Instance
+        public static new ServiceListResult<T> Instance
         {
             get { return new ServiceListResult<T>(); }
         }
 
         /// <summary>
-        /// Returns success result
+        /// Gets or sets total.
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
+        public long Total { get; set; }
+
+        /// <summary>
+        /// Returns success result.
+        /// </summary>
+        /// <param name="value">Value.</param>
+        /// <param name="total">Limit.</param>
+        /// <returns><see cref="ServiceListResult{T}"/>.</returns>
         public ServiceListResult<T> SuccessResult(List<T> value, long total)
         {
             Total = total;
@@ -86,29 +88,7 @@ namespace CoreCommon.Data.Domain.Business
     public class ServiceResult<T> : IServiceResult
     {
         /// <summary>
-        /// True if service succeeded
-        /// </summary>
-        public bool Success { get; set; }
-
-        /// <summary>
-        /// Service result code
-        /// </summary>
-        public int Code { get; set; }
-
-        /// <summary>
-        /// Custom message for service results
-        /// </summary>
-        public string Message { get; set; }
-
-        /// <summary>
-        /// Service result object data 
-        /// </summary>
-        public T Value { get; set; }
-
-        public string Debug { get; set; }
-
-        /// <summary>
-        /// Creates an instance
+        /// Gets an instance.
         /// </summary>
         public static ServiceResult<T> Instance
         {
@@ -116,45 +96,86 @@ namespace CoreCommon.Data.Domain.Business
         }
 
         /// <summary>
-        /// Returns error result
+        /// Gets or sets a value indicating whether Success.
         /// </summary>
-        /// <param name="resultCode"></param>
-        /// <param name="exception"></param>
-        /// <returns></returns>
+        public bool Success { get; set; }
+
+        /// <summary>
+        /// Gets or sets code.
+        /// </summary>
+        public int Code { get; set; }
+
+        /// <summary>
+        /// Gets or sets Message.
+        /// </summary>
+        public string Message { get; set; }
+
+        /// <summary>
+        /// Gets or sets data .
+        /// </summary>
+        public T Value { get; set; }
+
+        public object[] ErrorData { get; set; }
+
+        /// <summary>
+        /// Gets or sets Debug.
+        /// </summary>
+        public object Debug { get; set; }
+
+        /// <summary>
+        /// Returns error result.
+        /// </summary>
+        /// <param name="resultCode">ResultCode.</param>
+        /// <param name="exception">Exception.</param>
+        /// <returns><see cref="ServiceResult{T}"/>.</returns>
         public virtual ServiceResult<T> ErrorResult(int resultCode, Exception exception)
         {
-            var msg = exception.Message;
-            if (exception.InnerException != null) msg = exception.InnerException.Message;
+            var msg = exception.Message ?? string.Empty;
+            if (exception.InnerException != null)
+            {
+                msg += " \n" + exception.InnerException.Message;
+            }
+
             return ErrorResult(resultCode, msg);
         }
 
         /// <summary>
-        /// Returns error result
+        /// Returns error result.
         /// </summary>
-        /// <param name="resultCode"></param>
-        /// <param name="exception"></param>
-        /// <returns></returns>
+        /// <param name="resultCode">ResultCode.</param>
+        /// <param name="message">Message.</param>
+        /// <returns><see cref="ServiceResult{T}"/>.</returns>
         public virtual ServiceResult<T> ErrorResult(int resultCode = 0, string message = "")
         {
-            Value = default(T);
+            Value = default;
             return SetResult(false, resultCode, message);
         }
 
         /// <summary>
-        /// Returns success result
+        /// Returns success result.
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        public virtual ServiceResult<T> SuccessResult(T resultValue, int resultCode = 0)
+        /// <param name="resultValue">ResultValue.</param>
+        /// <param name="resultCode">ResultCode.</param>
+        /// <returns><see cref="ServiceResult{T}"/>.</returns>
+        public virtual ServiceResult<T> SuccessResult(T resultValue = default, int resultCode = 0)
         {
             Value = resultValue;
             return SetResult(true, resultCode, null);
         }
 
+        public virtual ServiceResult<T> SuccessResult()
+        {
+            Success = true;
+            return this;
+        }
+
         /// <summary>
-        /// Set properties simply
+        /// SetResult.
         /// </summary>
+        /// <param name="success">Success.</param>
+        /// <param name="resultCode">ResultCode.</param>
+        /// <param name="message">Message.</param>
+        /// <returns><see cref="ServiceResult{T}"/>.</returns>
         protected ServiceResult<T> SetResult(bool success, int resultCode, string message)
         {
             Success = success;
@@ -165,7 +186,7 @@ namespace CoreCommon.Data.Domain.Business
     }
 
     /// <summary>
-    /// non generic usage of service result 
+    /// non generic usage of service result .
     /// </summary>
     public class ServiceResult : ServiceResult<string>
     {

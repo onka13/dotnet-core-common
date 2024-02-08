@@ -3,59 +3,63 @@ using Amazon.S3;
 using Amazon.S3.Transfer;
 using CoreCommon.AmazonBusiness.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace CoreCommon.AmazonBusiness.helpers
+namespace CoreCommon.AmazonBusiness.helpers;
+
+public class AmazonS3Manager
 {
-    public class AmazonS3Manager
+    private IAmazonS3 s3Client;
+
+    public AmazonConfig Config { get; private set; }
+
+    public AmazonS3Manager(AmazonConfig config)
     {
-        private IAmazonS3 s3Client;
+        Config = config;
+        var region = RegionEndpoint.GetBySystemName(config.Region);
 
-        public AmazonConfig Config { get; private set; }
-
-        public AmazonS3Manager(AmazonConfig config)
+        s3Client = new AmazonS3Client(Config.AccessKey, Config.SecretKey, new AmazonS3Config()
         {
-            Config = config;
-            var region = RegionEndpoint.GetBySystemName(config.Region);
+            RegionEndpoint = region
+        });
+    }
 
-            s3Client = new AmazonS3Client(Config.AccessKey, Config.SecretKey, new AmazonS3Config()
-            {
-                RegionEndpoint = region
-            });
-        }
-
-        public async Task<bool> UploadFileAsync(string bucketName, string keyName, Stream stream)
+    public async Task<bool> UploadFileAsync(string bucketName, string keyName, Stream stream)
+    {
+        try
         {
-            try
-            {
-                var fileTransferUtility = new TransferUtility(s3Client);
+            var fileTransferUtility = new TransferUtility(s3Client);
 
-                var fileTransferUtilityRequest = new TransferUtilityUploadRequest
-                {
-                    InputStream = stream,
-                    BucketName = bucketName,
-                    Key = keyName,
-                    CannedACL = S3CannedACL.PublicRead
-                };
-                //fileTransferUtilityRequest.Metadata.Add("param1", "Value1");
+            var fileTransferUtilityRequest = new TransferUtilityUploadRequest
+            {
+                InputStream = stream,
+                BucketName = bucketName,
+                Key = keyName,
+                CannedACL = S3CannedACL.PublicRead
+            };
+            //fileTransferUtilityRequest.Metadata.Add("param1", "Value1");
 
-                await fileTransferUtility.UploadAsync(fileTransferUtilityRequest);
-                // result string.Format("http://{0}.s3.amazonaws.com/{1}", bucketName, keyName);
-                return true;
-            }
-            catch (AmazonS3Exception e)
-            {
-                Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
-                throw e;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
-                throw e;
-            }
-            return false;
+            await fileTransferUtility.UploadAsync(fileTransferUtilityRequest);
+            // result string.Format("http://{0}.s3.amazonaws.com/{1}", bucketName, keyName);
+            return true;
         }
+        catch (AmazonS3Exception e)
+        {
+            Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+            throw e;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+            throw e;
+        }
+    }
+
+    public Task<Stream> GetObjectStreamByKey(string bucketName, string keyName)
+    {
+        return s3Client.GetObjectStreamAsync(bucketName, keyName, new Dictionary<string, object>());
     }
 }
