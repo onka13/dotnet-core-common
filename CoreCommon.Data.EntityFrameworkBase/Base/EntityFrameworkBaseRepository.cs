@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Linq;
-using CoreCommon.Data.Domain.Entitites;
 using CoreCommon.Data.Domain.Business;
+using CoreCommon.Data.Domain.Entities;
 
 namespace CoreCommon.Data.EntityFrameworkBase.Base
 {
