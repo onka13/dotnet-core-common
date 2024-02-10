@@ -45,14 +45,15 @@ namespace CoreCommon.Infrastructure.Helpers
         /// <param name="culture"></param>
         /// <param name="isCamelCase"></param>
         /// <returns></returns>
-        public static string Serialize(object obj, CultureInfo culture = null, bool isCamelCase = false, bool isIndented = false, bool ignoreEmptyValues = false)
+        public static string Serialize(object obj, CultureInfo culture = null, bool isCamelCase = false, bool isIndented = false, bool minimise = false)
         {
             var writer = new StringWriter();
-            JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings
             {
                 Culture = culture,
                 Formatting = isIndented ? Formatting.Indented : Formatting.None,
-                DefaultValueHandling = ignoreEmptyValues ? DefaultValueHandling.Ignore : DefaultValueHandling.Include,
+                DefaultValueHandling = minimise ? DefaultValueHandling.Ignore : DefaultValueHandling.Include,
+                NullValueHandling = minimise ? NullValueHandling.Ignore : NullValueHandling.Include,
             });
             if (isCamelCase)
             {
@@ -77,10 +78,10 @@ namespace CoreCommon.Infrastructure.Helpers
         public static T Deserialize<T>(string json, CultureInfo culture = null)
         {
             var reader = new JsonTextReader(new StringReader(json));
-            JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings { Culture = culture });
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings { Culture = culture });
             serializer.Converters.Add(new FormattedDecimalConverter(culture));
             serializer.Converters.Add(new DateTimeConverter());
-            serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            serializer.DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate;
             return serializer.Deserialize<T>(reader);
         }
 
